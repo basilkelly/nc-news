@@ -4,6 +4,7 @@ const db = require("../db/connection.js");
 const request = require("supertest");
 const app = require("../app/app.js");
 const endpointsJson = require("../endpoints.json");
+const { filter } = require("../db/data/test-data/articles.js");
 
 beforeAll(() => {
   return seed(data);
@@ -141,12 +142,81 @@ describe("GET /api/articles/:article_id", () => {
         expect(response.body.msg).toBe("not found");
       });
   });
-  test(" returns an appropriate status and error message when given an invalid article id", () => {
+  test("returns an appropriate status and error message when given an invalid article id", () => {
     return request(app)
       .get("/api/articles/hello")
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe("Bad request");
+      });
+  });
+});
+describe("GET /api/articles", () => {
+  test("response code is 200", () => {
+    return request(app).get("/api/articles").expect(200);
+  });
+  test("returns array", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((res) => {
+        expect(Array.isArray(res.body)).toBe(true);
+      });
+  });
+  test("first article does not return a body property", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((res) => {
+        const actual = res.body[0].body;
+        expect(actual).toBe(undefined);
+      });
+  });
+  test("All articles do not return a body property", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((res) => {
+        let actual = true;
+        res.body.forEach((element) => {
+          if (element.body) {
+            actual = true;
+          } else {
+            actual = false;
+          }
+        });
+        expect(actual).toBe(false);
+      });
+  });
+  test("articles returns a comment property with correct count of appearances of article id in comments database", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((res) => {
+        //console.log(res.body[0]);
+        const actual = res.body;
+        const firstArticle = actual.filter(
+          (article) => article.article_id === 1
+        );
+        expect(Number(firstArticle[0].comment_count)).toEqual(11);
+      });
+  });
+  test("all articles return a comment property", () => {
+    let IsCommentCountPresent;
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((res) => {
+        const actual = res.body;
+
+        res.body.forEach((element) => {
+          if (element.comment_count.length === 0) {
+            IsCommentCountPresent = false;
+          } else {
+            IsCommentCountPresent = true;
+          }
+        });
+        expect(IsCommentCountPresent).toEqual(true);
       });
   });
 });
