@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { forEach } = require("../db/data/test-data/articles");
 const fs = require("fs").promises;
 
 function getAllTopics() {
@@ -35,5 +36,31 @@ function selectArticleById(articleId) {
       return data.rows[0];
     });
 }
+function selectAllArticles() {
+  return db
+    .query(
+      `SELECT COUNT(comments.article_id) AS comment_count,
+  articles.article_id, 
+  articles.title, 
+  articles.topic, 
+  articles.author, 
+  articles.created_at, 
+  articles.votes, 
+  articles.article_img_url
+  FROM articles
+  JOIN comments ON articles.article_id = comments.article_id 
+  GROUP BY articles.article_id 
+  ORDER BY articles.created_at DESC;`
+    )
 
-module.exports = { getAllTopics, getAllEndpoints, selectArticleById };
+    .then((result) => {
+      return result.rows;
+    });
+}
+
+module.exports = {
+  getAllTopics,
+  getAllEndpoints,
+  selectArticleById,
+  selectAllArticles,
+};
