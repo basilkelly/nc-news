@@ -3,7 +3,7 @@ const data = require("../db/data/test-data/index.js");
 const db = require("../db/connection.js");
 const request = require("supertest");
 const app = require("../app/app.js");
-const endpointsJson = require("../endpoints.json")
+const endpointsJson = require("../endpoints.json");
 
 beforeAll(() => {
   return seed(data);
@@ -62,26 +62,91 @@ describe("GET ./api/topics", () => {
 });
 
 describe("GET /api", () => {
-    test("response code is 200", () => {
-        return request(app)
-        .get("/api")
-        .expect(200);
-      });
+  test("response code is 200", () => {
+    return request(app).get("/api").expect(200);
+  });
 
-    test("returns an object", ()=> {
-        return request(app)
-        .get("/api")
-        .expect(200)
-        .then((response)=>{
-            expect(typeof response.body).toEqual('object')
-        })
-    })
-    test("returns value of endponts.json file", ()=> {
-        return request(app)
-        .get("/api")
-        .expect(200)
-        .then((response)=>{
-            expect(response.body).toEqual(endpointsJson)
-        })
-    })
-})
+  test("returns an object", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((response) => {
+        expect(typeof response.body).toEqual("object");
+      });
+  });
+  test("returns value of endponts.json file", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual(endpointsJson);
+      });
+  });
+});
+describe("GET /api/articles/:article_id", () => {
+  test("response code is 200", () => {
+    return request(app).get("/api/articles/1").expect(200);
+  });
+  test("returns an object", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .then((response) => {
+        expect(typeof response.body.article).toBe("object");
+        expect(Array.isArray(response.body.article)).toBe(false);
+        expect(response.body.article).not.toBeNull();
+      });
+  });
+  test("returns correct article first object", () => {
+    const expected = {
+      article_id: 1,
+      title: "Living in the shadow of a great man",
+      topic: "mitch",
+      author: "butter_bridge",
+      body: "I find this existence challenging",
+      created_at: "2020-07-09T20:11:00.000Z",
+      votes: 100,
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+    return request(app)
+      .get("/api/articles/1")
+      .then((response) => {
+        expect(response.body.article).toEqual(expected);
+      });
+  });
+  test("returns article for number requested", () => {
+    const expected = {
+      article_id: 3,
+      title: "Eight pug gifs that remind me of mitch",
+      topic: "mitch",
+      author: "icellusedkars",
+      body: "some gifs",
+      created_at: "2020-11-03T09:12:00.000Z",
+      votes: 0,
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+    return request(app)
+      .get("/api/articles/3")
+      .then((response) => {
+        expect(response.body.article).toEqual(expected);
+      });
+  });
+
+  test("returns an appropriate status and error message when given a valid but non-existent article id", () => {
+    return request(app)
+      .get("/api/articles/30000")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("not found");
+      });
+  });
+  test(" returns an appropriate status and error message when given an invalid article id", () => {
+    return request(app)
+      .get("/api/articles/hello")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
+      });
+  });
+});

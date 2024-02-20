@@ -9,11 +9,12 @@
       "topics": [{ "slug": "football", "description": "Footie!" }]
     }
   },
-  "GET /api/articles": {
-    "description": "serves an array of all articles",
-    "queries": ["author", "topic", "sort_by", "order"],
+  "GET /api/articles/:article_id": {
+    "description": "serves an array of a specified article",
+    "queries": [],
     "exampleResponse": {
-      "articles": [
+
+      "article": [
         {
           "title": "Seafood substitutions are increasing",
           "topic": "cooking",
