@@ -1,5 +1,5 @@
 const {
-  getAllTopics,
+  SelectAllTopics,
   getAllEndpoints,
   selectArticleById,
   selectAllArticles,
@@ -14,7 +14,7 @@ module.exports = {
 };
 
 function getTopics(request, response) {
-  getAllTopics().then((topics) => {
+  SelectAllTopics().then((topics) => {
     response.status(200).send({ topics });
   });
 }

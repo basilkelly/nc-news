@@ -2,7 +2,7 @@ const db = require("../db/connection");
 const { forEach } = require("../db/data/test-data/articles");
 const fs = require("fs").promises;
 
-function getAllTopics() {
+function SelectAllTopics() {
   const query = `SELECT * FROM topics;`;
   return db.query(query).then((result) => {
     return result.rows;
@@ -76,7 +76,7 @@ WHERE comments.article_id = $1 ORDER BY created_at DESC`,
 }
 
 module.exports = {
-  getAllTopics,
+  SelectAllTopics,
   getAllEndpoints,
   selectArticleById,
   selectAllArticles,
