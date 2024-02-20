@@ -3,8 +3,15 @@ const {
   getAllEndpoints,
   selectArticleById,
   selectAllArticles,
+  SelectArticleComments,
 } = require("../model/model");
-module.exports = { getTopics, getApi, getArticle, getArticles };
+module.exports = {
+  getTopics,
+  getApi,
+  getArticle,
+  getArticles,
+  getArticleComments,
+};
 
 function getTopics(request, response) {
   getAllTopics().then((topics) => {
@@ -30,6 +37,14 @@ function getArticles(request, response, next) {
   selectAllArticles()
     .then((result) => {
       response.status(200).send(result);
+    })
+    .catch(next);
+}
+function getArticleComments(request, response, next) {
+  const ArticleId = request.params.article_id;
+  SelectArticleComments(ArticleId)
+    .then((commentsArray) => {
+      response.status(200).send(commentsArray);
     })
     .catch(next);
 }
