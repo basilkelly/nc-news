@@ -58,9 +58,27 @@ function selectAllArticles() {
     });
 }
 
+function SelectArticleComments(articleId){
+  return db
+    .query(
+      `SELECT *
+FROM comments
+WHERE comments.article_id = $1 ORDER BY created_at DESC`,
+      [articleId]
+    )
+
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "not found" });
+      }
+      return result.rows;
+    });
+}
+
 module.exports = {
   getAllTopics,
   getAllEndpoints,
   selectArticleById,
   selectAllArticles,
+  SelectArticleComments,
 };

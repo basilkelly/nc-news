@@ -220,3 +220,61 @@ describe("GET /api/articles", () => {
       });
   });
 });
+describe("GET /api/articles/:article_id/comments", () => {
+  test("response code is 200", () => {
+    return request(app).get("/api/articles/1/comments").expect(200);
+  });
+  test("returns an array", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((result) => {
+        expect(Array.isArray(result.body)).toEqual(true);
+      });
+  });
+  test("returns an array containing correct number of comment objects for the given article", () => {
+    return request(app)
+      .get("/api/articles/3/comments")
+      .expect(200)
+      .then((result) => {
+        expect(result.body.length).toEqual(2);
+      });
+  });
+  test("comment object contains correct keys", () => {
+    return request(app)
+      .get("/api/articles/3/comments")
+      .expect(200)
+      .then((result) => {
+        const wantedProperties = [
+          "comment_id",
+          "votes",
+          "created_at",
+          "author",
+          "body",
+          "article_id",
+        ];
+
+        const actual = wantedProperties.every((key) =>
+          Object.keys(result.body[0]).includes(key)
+        );
+
+        expect(actual).toEqual(true);
+      });
+  });
+  test("returns an appropriate status and error message when given a valid but non-existent article id", () => {
+    return request(app)
+      .get("/api/articles/30000/comments")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("not found");
+      });
+  });
+  test("returns an appropriate status and error message when given an invalid article id", () => {
+    return request(app)
+      .get("/api/articles/helloworld/comments")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
+      });
+  });
+});
