@@ -36,8 +36,8 @@ function getApi(request, response) {
 }
 
 function getArticle(request, response, next) {
-  const ArticleId = request.params.article_id;
-  selectArticleById(ArticleId)
+  const articleId = request.params.article_id;
+  selectArticleById(articleId)
     .then((article) => {
       response.status(200).send({ article });
     })
@@ -51,8 +51,8 @@ function getArticles(request, response, next) {
     .catch(next);
 }
 function getArticleComments(request, response, next) {
-  const ArticleId = request.params.article_id;
-  SelectArticleComments(ArticleId)
+  const articleId = request.params.article_id;
+  SelectArticleComments(articleId)
     .then((commentsArray) => {
       response.status(200).send(commentsArray);
     })
@@ -60,20 +60,20 @@ function getArticleComments(request, response, next) {
 }
 
 function postComment(request, response, next) {
-  const ArticleId = request.params.article_id;
+  const articleId = request.params.article_id;
   const comment = request.body;
 
-  return addArticleComment(ArticleId, comment)
+  return addArticleComment(articleId, comment)
     .then((result) => {
       response.status(201).send(result);
     })
     .catch(next);
 }
 function patchArticle(request, response, next) {
-  const ArticleId = request.params.article_id;
+  const articleId = request.params.article_id;
   const updateRequest = request.body;
 
-  return updateArticle(ArticleId, updateRequest)
+  return updateArticle(articleId, updateRequest)
     .then((result) => {
       response.status(200).send(result);
     })
