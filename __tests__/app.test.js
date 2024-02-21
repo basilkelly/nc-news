@@ -193,7 +193,6 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then((res) => {
-        //console.log(res.body[0]);
         const actual = res.body;
         const firstArticle = actual.filter(
           (article) => article.article_id === 1
@@ -275,6 +274,91 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe("Bad request");
+      });
+  });
+});
+describe("POST /api/articles/:article_id/comments", () => {
+  test("response code is 201", () => {
+    const post = { username: "butter_bridge", body: "hello" };
+
+    return request(app).post("/api/articles/3/comments").send(post).expect(201);
+  });
+  test("returns an object", () => {
+    const post = { username: "butter_bridge", body: "hello" };
+
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send(post)
+      .expect(201)
+      .then((response) => {
+        expect(typeof response.body).toEqual("object");
+      });
+  });
+  test("returns an object with expected keys", () => {
+    const post = { username: "butter_bridge", body: "hello" };
+
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send(post)
+      .expect(201)
+      .then((response) => {
+        const ActualkeysArray = Object.keys(response.body);
+        expect(ActualkeysArray.includes("comment_id")).toEqual(true);
+        expect(ActualkeysArray.includes("body")).toEqual(true);
+        expect(ActualkeysArray.includes("article_id")).toEqual(true);
+        expect(ActualkeysArray.includes("author")).toEqual(true);
+        expect(ActualkeysArray.includes("votes")).toEqual(true);
+      });
+  });
+  test("returns expected object for a given post", () => {
+    const post = { username: "butter_bridge", body: "hello" };
+
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send(post)
+      .expect(201)
+      .then((response) => {
+        expect(response.body).toEqual({
+          article_id: 3,
+          author: "butter_bridge",
+          body: "hello",
+          comment_id: 22,
+          created_at: null,
+          votes: 0,
+        });
+      });
+  });
+  test("returns an appropriate status and error message when given an invalid username", () => {
+    const post = { username: "not_butter_bridge", body: "hello" };
+
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send(post)
+      .expect(400)
+
+      .then((response) => {
+        expect(response.body.msg).toEqual("Bad request");
+      });
+  });
+  test("returns an error if given an article that does not exist in database", () => {
+    const post = { username: "butter_bridge", body: "hello" };
+    return request(app)
+      .post("/api/articles/333333/comments")
+      .send(post)
+      .expect(400)
+
+      .then((response) => {
+        expect(response.body.msg).toEqual("Bad request");
+      });
+  });
+  test("returns an error if given a post with a missing property", () => {
+    const post = { username: "butter_bridge" };
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send(post)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toEqual("Bad request");
       });
   });
 });
