@@ -362,3 +362,91 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 });
+describe("PATCH /api/articles/:article_id", () => {
+  test("response code is 200", () => {
+    const patch = { inc_votes: 1 };
+
+    return request(app)
+    .patch("/api/articles/3")
+    .send(patch)
+    .expect(200);
+  });
+  test("Succesfully patched articles database", () => {
+    const patch = { inc_votes: 1 };
+
+    return request(app)
+    .patch("/api/articles/4")
+    .send(patch)
+    .expect(200)
+
+      .then((res) => {
+        expect(res.body.votes).toBe(1);
+      });
+  });
+  test("returns an appropriate status and error message when given an invalid vote value", () => {
+    const patch = { inc_votes: "hello" };
+
+    return request(app)
+    .patch("/api/articles/3")
+    .send(patch)
+    .expect(400)
+
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad request");
+      });
+  });
+  test("returns error when passed article id that doesnt exist", () => {
+    const patch = { inc_votes: 1 };
+
+    return request(app)
+      .patch("/api/articles/99999")
+      .send(patch)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("not found");
+      });
+  });
+  test("Succesfully patched articles database when using negative numbers", () => {
+    const patch = { inc_votes: -1 };
+
+    return request(app)
+    .patch("/api/articles/5")
+    .send(patch)
+    .expect(200)
+
+      .then((res) => {
+        expect(res.body.votes).toBe(-1);
+      });
+  });
+  test("Succesfully increments votes based on current vote value in article", () => {
+    const patch = { inc_votes: 1 };
+
+    return request(app)
+    .patch("/api/articles/1")
+    .send(patch)
+    .expect(200)
+
+      .then((res) => {
+        expect(res.body.votes).toBe(101);
+      });
+  });
+  test("returns an article object with expected keys", () => {
+    const patch = { inc_votes: 0 };
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send(patch)
+      .expect(200)
+      .then((response) => {
+        const ActualkeysArray = Object.keys(response.body);
+        expect(ActualkeysArray.includes("article_id")).toEqual(true);
+        expect(ActualkeysArray.includes("title")).toEqual(true);
+        expect(ActualkeysArray.includes("topic")).toEqual(true);
+        expect(ActualkeysArray.includes("author")).toEqual(true);
+        expect(ActualkeysArray.includes("body")).toEqual(true);
+        expect(ActualkeysArray.includes("created_at")).toEqual(true);
+        expect(ActualkeysArray.includes("votes")).toEqual(true);
+        expect(ActualkeysArray.includes("article_img_url")).toEqual(true);
+      });
+  });
+})
