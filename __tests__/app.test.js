@@ -533,4 +533,49 @@ describe("DELETE /api/comments/:comment_id", () => {
   });
 });
 
-
+describe("GET /api/users", () => {
+  test("response code is 200", () => {
+    return request(app).get("/api/users").expect(200);
+  });
+  test("users table exists in database", () => {
+    return db
+      .query(
+        `SELECT EXISTS (
+                          SELECT FROM 
+                          information_schema.tables 
+                          WHERE 
+                          table_name = 'users'
+                          );`
+      )
+      .then(({ rows: [{ exists }] }) => {
+        expect(exists).toBe(true);
+      });
+  });
+  test("returns an array", () => {
+    return request(app)
+      .get("/api/users")
+      .then((res) => {
+        expect(Array.isArray(res.body.users)).toBe(true);
+      });
+  });
+  test("Returned array contains correct number of objects", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then((response) => {
+        const result = response.body.users;
+        expect(result.length).toBe(4);
+      });
+  });
+  test("returned user object has correct keys", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then((response) => {
+        const ActualkeysArray = Object.keys(response.body.users[0]);
+        expect(ActualkeysArray.includes("username")).toEqual(true);
+        expect(ActualkeysArray.includes("name")).toEqual(true);
+        expect(ActualkeysArray.includes("avatar_url")).toEqual(true);
+      });
+  });
+});

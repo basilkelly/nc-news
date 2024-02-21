@@ -119,7 +119,7 @@ function updateArticle(articleId, updateRequest) {
 }
 
 function removeComment(commentId) {
-  const ValidCommentNum = Number(commentId)
+  const ValidCommentNum = Number(commentId);
   const query = `DELETE FROM comments WHERE comment_id = $1 RETURNING *;`;
   return db.query(query, [ValidCommentNum]).then((result) => {
     if (result.rowCount === 0) {
@@ -130,6 +130,12 @@ function removeComment(commentId) {
 }
 function SelectAllComments() {
   const query = `SELECT * FROM comments;`;
+  return db.query(query).then((result) => {
+    return result.rows;
+  });
+}
+function selectAllUsers() {
+  const query = `SELECT * FROM users;`;
   return db.query(query).then((result) => {
     return result.rows;
   });
@@ -145,4 +151,5 @@ module.exports = {
   updateArticle,
   removeComment,
   SelectAllComments,
+  selectAllUsers,
 };
