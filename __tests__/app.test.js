@@ -447,43 +447,6 @@ describe("PATCH /api/articles/:article_id", () => {
       });
   });
 });
-describe("DELETE /api/comments/:comment_id", () => {
-  test("response code is 204", () => {
-    return request(app).delete("/api/comments/22").expect(204);
-  });
-  test("Deletes a row", () => {
-    let numberOfRows;
-    return request(app)
-      .get("/api/comments")
-      .then((rows) => {
-        numberOfRows = rows.body.comments.length;
-        return request(app).delete("/api/comments/21");
-      })
-      .then(() => {
-        return request(app).get("/api/comments");
-      })
-      .then((rows) => {
-        expect(rows.body.comments.length).toBe(numberOfRows - 1);
-      });
-  });
-  test("returns an appropriate status and error message when given an article that does not exist", () => {
-    return request(app)
-      .delete("/api/comments/50")
-      .expect(404)
-      .then((res) => {
-        expect(res.body.msg).toBe("not found");
-      });
-  });
-  test("returns an appropriate status and error message when given an invalid comment id", () => {
-    return request(app)
-      .delete("/api/comments/deletethecomment")
-      .expect(400)
-      .then((response) => {
-        expect(response.body.msg).toBe("Bad request");
-      });
-  });
-});
-
 describe("GET ./api/comments", () => {
   test("response code is 200", () => {
     return request(app).get("/api/comments").expect(200);
@@ -515,7 +478,7 @@ describe("GET ./api/comments", () => {
       .expect(200)
       .then((response) => {
         const result = response.body.comments;
-        expect(result.length).toBe(20);
+        expect(result.length).toBe(22);
       });
   });
   test("returns a comment object with correct keys", () => {
@@ -533,3 +496,41 @@ describe("GET ./api/comments", () => {
       });
   });
 });
+describe("DELETE /api/comments/:comment_id", () => {
+  test("response code is 204", () => {
+    return request(app).delete("/api/comments/22").expect(204);
+  });
+  test("Deletes a row", () => {
+    let numberOfRows;
+    return request(app)
+      .get("/api/comments")
+      .then((rows) => {
+        numberOfRows = rows.body.comments.length;
+        return request(app).delete("/api/comments/21").expect(204);
+      })
+      .then(() => {
+        return request(app).get("/api/comments");
+      })
+      .then((rows) => {
+        expect(rows.body.comments.length).toBe(numberOfRows - 1);
+      });
+  });
+  test("returns an appropriate status and error message when given an article that does not exist", () => {
+    return request(app)
+      .delete("/api/comments/50")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("not found");
+      });
+  });
+  test("returns an appropriate status and error message when given an invalid comment id", () => {
+    return request(app)
+      .delete("/api/comments/deletethecomment")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
+      });
+  });
+});
+
+
