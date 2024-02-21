@@ -96,7 +96,7 @@ created_at)
 }
 
 function updateArticle(articleId, updateRequest) {
-  const voteIncrementNum = Number((Object.values(updateRequest)))
+  const voteIncrementNum = Number(Object.values(updateRequest));
   const select = `
   SELECT *
   FROM articles
@@ -115,7 +115,24 @@ function updateArticle(articleId, updateRequest) {
         return Promise.reject({ status: 404, msg: "not found" });
       }
       return response.rows[0];
-    }) 
+    });
+}
+
+function removeComment(commentId) {
+  const ValidCommentNum = Number(commentId)
+  const query = `DELETE FROM comments WHERE comment_id = $1 RETURNING *;`;
+  return db.query(query, [ValidCommentNum]).then((result) => {
+    if (result.rowCount === 0) {
+      return Promise.reject({ status: 404, msg: "not found" });
+    }
+    return result.rows[0];
+  });
+}
+function SelectAllComments() {
+  const query = `SELECT * FROM comments;`;
+  return db.query(query).then((result) => {
+    return result.rows;
+  });
 }
 
 module.exports = {
@@ -126,4 +143,6 @@ module.exports = {
   SelectArticleComments,
   addArticleComment,
   updateArticle,
+  removeComment,
+  SelectAllComments,
 };

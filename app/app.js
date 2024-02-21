@@ -6,8 +6,11 @@ const {
   getArticles,
   getArticleComments,
   postComment,
-  patchArticle
+  patchArticle,
+  deleteComment,
+  getComments,
 } = require("../controllers/controller");
+
 const app = express();
 app.use(express.json());
 
@@ -16,8 +19,10 @@ app.get("/api", getApi);
 app.get("/api/articles/:article_id", getArticle);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getArticleComments);
+app.get("/api/comments", getComments);
 app.post("/api/articles/:article_id/comments", postComment);
-app.patch("/api/articles/:article_id", patchArticle)
+app.patch("/api/articles/:article_id", patchArticle);
+app.delete("/api/comments/:comment_id", deleteComment);
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
@@ -40,6 +45,5 @@ app.use((err, req, res, next) => {
 app.use((error, request, response, next) => {
   return response.status(500).send({ msg: "internal server error" });
 });
-
 
 module.exports = app;
