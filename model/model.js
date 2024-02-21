@@ -2,7 +2,7 @@ const db = require("../db/connection");
 const { forEach } = require("../db/data/test-data/articles");
 const fs = require("fs").promises;
 
-function SelectAllTopics() {
+function selectAllTopics() {
   const query = `SELECT * FROM topics;`;
   return db.query(query).then((result) => {
     return result.rows;
@@ -142,7 +142,7 @@ function selectAllUsers() {
 }
 
 module.exports = {
-  SelectAllTopics,
+  selectAllTopics,
   getAllEndpoints,
   selectArticleById,
   selectAllArticles,
