@@ -6,6 +6,8 @@ const {
   SelectArticleComments,
   addArticleComment,
   updateArticle,
+  removeComment,
+  SelectAllComments,
 } = require("../model/model");
 module.exports = {
   getTopics,
@@ -15,6 +17,8 @@ module.exports = {
   getArticleComments,
   postComment,
   patchArticle,
+  deleteComment,
+  getComments,
 };
 
 function getTopics(request, response) {
@@ -68,8 +72,26 @@ function patchArticle(request, response, next) {
   const updateRequest = request.body;
 
   return updateArticle(ArticleId, updateRequest)
-  .then((result) => {
-    response.status(200).send(result);
-  })
-  .catch(next);
+    .then((result) => {
+      response.status(200).send(result);
+    })
+    .catch(next);
+}
+
+function deleteComment(request, response, next) {
+  const commentId = request.params.comment_id;
+
+  removeComment(commentId)
+    .then(() => {
+      response.status(204).send({ msg: "no content" });
+    })
+    .catch(next);
+}
+
+function getComments(request, response, next) {
+  SelectAllComments()
+    .then((comments) => {
+      response.status(200).send({ comments });
+    })
+    .catch(next);
 }
