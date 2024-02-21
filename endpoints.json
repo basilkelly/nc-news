@@ -57,5 +57,17 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "serves an object of a new comment based on request body, for a specified article",
+    "queries": [],
+    "exampleResponse": {
+      "article_id": 3,
+      "author": "butter_bridge",
+      "body": "hello",
+      "comment_id": 22,
+      "created_at": null,
+      "votes": 0
+    }
   }
 }

@@ -5,6 +5,7 @@ const {
   getArticle,
   getArticles,
   getArticleComments,
+  postComment,
 } = require("../controllers/controller");
 const app = express();
 app.use(express.json());
@@ -14,9 +15,16 @@ app.get("/api", getApi);
 app.get("/api/articles/:article_id", getArticle);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getArticleComments);
+app.post("/api/articles/:article_id/comments", postComment);
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
+    return res.status(400).send({ msg: "Bad request" });
+  }
+  if (err.code === "23502") {
+    return res.status(400).send({ msg: "Bad request" });
+  }
+  if (err.code === "23503") {
     return res.status(400).send({ msg: "Bad request" });
   } else next(err);
 });

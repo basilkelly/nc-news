@@ -58,7 +58,7 @@ function selectAllArticles() {
     });
 }
 
-function SelectArticleComments(articleId){
+function SelectArticleComments(articleId) {
   return db
     .query(
       `SELECT *
@@ -74,6 +74,28 @@ WHERE comments.article_id = $1 ORDER BY created_at DESC`,
       return result.rows;
     });
 }
+function addArticleComment(articleId, comment) {
+  const newCommentArray = [
+    comment.body,
+    0,
+    comment.username,
+    articleId,
+    comment.created_at,
+  ];
+  const query = `INSERT INTO comments (body,
+votes,
+author,
+article_id,
+created_at) 
+  VALUES ($1, $2, $3, $4, $5)
+  RETURNING *;
+  `;
+  return db.query(query, newCommentArray).then((result) => {
+    return result.rows[0];
+  }); //.catch((err)=>{
+  //console.log(err)
+  //})
+}
 
 module.exports = {
   SelectAllTopics,
@@ -81,4 +103,5 @@ module.exports = {
   selectArticleById,
   selectAllArticles,
   SelectArticleComments,
+  addArticleComment,
 };
