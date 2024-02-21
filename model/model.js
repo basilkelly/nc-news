@@ -92,9 +92,30 @@ created_at)
   `;
   return db.query(query, newCommentArray).then((result) => {
     return result.rows[0];
-  }); //.catch((err)=>{
-  //console.log(err)
-  //})
+  });
+}
+
+function updateArticle(articleId, updateRequest) {
+  const voteIncrementNum = Number((Object.values(updateRequest)))
+  const select = `
+  SELECT *
+  FROM articles
+  WHERE article_id = $1
+  ;`;
+
+  const query = `UPDATE articles SET votes = votes + $1 WHERE article_id = $2;`;
+
+  return db
+    .query(query, [voteIncrementNum, articleId])
+    .then(() => {
+      return db.query(select, [articleId]);
+    })
+    .then((response) => {
+      if (response.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "not found" });
+      }
+      return response.rows[0];
+    }) 
 }
 
 module.exports = {
@@ -104,4 +125,5 @@ module.exports = {
   selectAllArticles,
   SelectArticleComments,
   addArticleComment,
+  updateArticle,
 };
