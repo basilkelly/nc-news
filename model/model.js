@@ -37,14 +37,20 @@ function selectArticleById(articleId) {
       return data.rows[0];
     });
 }
-function selectAllArticles(topic) {
-  if (topic) {
-    const allowedTopics = ["paper", "cats", "mitch"];
-    if (!allowedTopics.includes(topic)) {
-      return Promise.reject({ status: 400, msg: "Bad request" });
-    }
+function checkTopic(topic) {
+  const topicName = topic;
+  if (topicName != undefined) {
+    const query = `SELECT * FROM topics WHERE slug = $1`;
+    return db.query(query, [topicName]).then((result) => {
+      if (result.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "not found" });
+      }
+      return result.rows;
+    });
   }
-
+  return true;
+}
+function selectAllArticles(topic) {
   let queryString = `SELECT COUNT(comments.article_id) AS comment_count,
   articles.article_id, 
   articles.title, 
@@ -67,9 +73,6 @@ GROUP BY articles.article_id
 ORDER BY articles.created_at DESC`;
 
   return db.query(queryString, queryValues).then((result) => {
-    if (result.rowCount === 0) {
-      return Promise.reject({ status: 404, msg: "not found" });
-    }
     return result.rows;
   });
 }
@@ -173,4 +176,5 @@ module.exports = {
   SelectAllComments,
   selectAllUsers,
   checkComment,
+  checkTopic,
 };
