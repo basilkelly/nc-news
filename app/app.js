@@ -39,7 +39,10 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  if (err.status && err.msg) {
+  if (err.status === 400 && err.msg === "Bad request") {
+    return res.status(400).send({ msg: "Bad request" });
+  }
+  if (err.status === 404 && err.msg === "not found") {
     return res.status(404).send({ msg: "not found" });
   } else next(err);
 });

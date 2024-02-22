@@ -206,8 +206,6 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then((res) => {
-        const actual = res.body;
-
         res.body.forEach((element) => {
           if (element.comment_count.length === 0) {
             IsCommentCountPresent = false;
@@ -447,72 +445,18 @@ describe("PATCH /api/articles/:article_id", () => {
       });
   });
 });
-describe("GET ./api/comments", () => {
-  test("response code is 200", () => {
-    return request(app).get("/api/comments").expect(200);
-  });
-  test("comments table exists in database", () => {
-    return db
-      .query(
-        `SELECT EXISTS (
-                          SELECT FROM 
-                          information_schema.tables 
-                          WHERE 
-                          table_name = 'comments'
-                          );`
-      )
-      .then(({ rows: [{ exists }] }) => {
-        expect(exists).toBe(true);
-      });
-  });
-  test("returns array", () => {
-    return request(app)
-      .get("/api/comments")
-      .then((res) => {
-        expect(Array.isArray(res.body.comments)).toBe(true);
-      });
-  });
-  test("Returned array contains correct number of objects", () => {
-    return request(app)
-      .get("/api/comments")
-      .expect(200)
-      .then((response) => {
-        const result = response.body.comments;
-        expect(result.length).toBe(22);
-      });
-  });
-  test("returns a comment object with correct keys", () => {
-    return request(app)
-      .get("/api/comments")
-      .expect(200)
-      .then((response) => {
-        const ActualkeysArray = Object.keys(response.body.comments[0]);
-        expect(ActualkeysArray.includes("comment_id")).toEqual(true);
-        expect(ActualkeysArray.includes("body")).toEqual(true);
-        expect(ActualkeysArray.includes("article_id")).toEqual(true);
-        expect(ActualkeysArray.includes("author")).toEqual(true);
-        expect(ActualkeysArray.includes("votes")).toEqual(true);
-        expect(ActualkeysArray.includes("created_at")).toEqual(true);
-      });
-  });
-});
+
 describe("DELETE /api/comments/:comment_id", () => {
   test("response code is 204", () => {
     return request(app).delete("/api/comments/22").expect(204);
   });
   test("Deletes a row", () => {
-    let numberOfRows;
-    return request(app)
-      .get("/api/comments")
-      .then((rows) => {
-        numberOfRows = rows.body.comments.length;
-        return request(app).delete("/api/comments/21").expect(204);
-      })
+        return request(app).delete("/api/comments/21").expect(204)
       .then(() => {
-        return request(app).get("/api/comments");
+        return db.query(`SELECT * FROM comments WHERE comments.comment_id = $1`, [21])
       })
-      .then((rows) => {
-        expect(rows.body.comments.length).toBe(numberOfRows - 1);
+      .then(({rows}) => {
+        expect(rows).toEqual([])
       });
   });
   test("returns an appropriate status and error message when given an article that does not exist", () => {
@@ -576,6 +520,30 @@ describe("GET /api/users", () => {
         expect(ActualkeysArray.includes("username")).toEqual(true);
         expect(ActualkeysArray.includes("name")).toEqual(true);
         expect(ActualkeysArray.includes("avatar_url")).toEqual(true);
+      });
+  });
+});
+
+describe("GET /api/articles (topic query)", () => {
+  test("response code is 200", () => {
+    return request(app).get("/api/articles?topic=cats").expect(200);
+  });
+  test("returns an array of correct length", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then((response) => {
+        const result = response.body;
+        expect(result.length).toBe(1);
+      });
+  });
+  test("returns error if given an invalid topic query", () => {
+    return request(app)
+      .get("/api/articles?topic=dogs")
+      .expect(400)
+      .then((response) => {
+        const result = response.body.msg;
+        expect(result).toBe("Bad request");
       });
   });
 });
