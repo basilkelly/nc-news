@@ -10,6 +10,7 @@ const {
   checkComment,
   SelectAllComments,
   selectAllUsers,
+  checkTopic,
 } = require("../model/model");
 module.exports = {
   getTopics,
@@ -46,9 +47,11 @@ function getArticle(request, response, next) {
 }
 function getArticles(request, response, next) {
   const { topic } = request.query;
-  selectAllArticles(topic)
+
+  Promise.all([checkTopic(topic), selectAllArticles(topic)])
     .then((result) => {
-      response.status(200).send(result);
+      result.reverse();
+      response.status(200).send(result[0]);
     })
     .catch(next);
 }
