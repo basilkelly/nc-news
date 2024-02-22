@@ -97,43 +97,36 @@ describe("GET /api/articles/:article_id", () => {
         expect(response.body.article).not.toBeNull();
       });
   });
-  test("returns correct article first object", () => {
-    const expected = {
-      article_id: 1,
-      title: "Living in the shadow of a great man",
-      topic: "mitch",
-      author: "butter_bridge",
-      body: "I find this existence challenging",
-      created_at: "2020-07-09T20:11:00.000Z",
-      votes: 100,
-      article_img_url:
-        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-    };
+  test("returns correct keys and properties from first article", () => {
     return request(app)
       .get("/api/articles/1")
-      .then((response) => {
-        expect(response.body.article).toEqual(expected);
+      .then((response) => {    
+        expect(response.body.article).toMatchObject({
+          article_id: 1,
+          title: 'Living in the shadow of a great man',
+          topic: 'mitch',
+          author: 'butter_bridge',
+          created_at: '2020-07-09T20:11:00.000Z',
+          votes: 100,
+          article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
+      });
       });
   });
-  test("returns article for number requested", () => {
-    const expected = {
-      article_id: 3,
-      title: "Eight pug gifs that remind me of mitch",
-      topic: "mitch",
-      author: "icellusedkars",
-      body: "some gifs",
-      created_at: "2020-11-03T09:12:00.000Z",
-      votes: 0,
-      article_img_url:
-        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-    };
+  test("returns correct keys and properties of the article number requested", () => {
     return request(app)
       .get("/api/articles/3")
       .then((response) => {
-        expect(response.body.article).toEqual(expected);
+        expect(response.body.article).toMatchObject({
+          article_id: 3,
+          title: 'Eight pug gifs that remind me of mitch',
+          topic: 'mitch',
+          author: 'icellusedkars',
+          created_at: '2020-11-03T09:12:00.000Z',
+          votes: 0,
+          article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
       });
   });
-
+  })
   test("returns an appropriate status and error message when given a valid but non-existent article id", () => {
     return request(app)
       .get("/api/articles/30000")
@@ -451,12 +444,17 @@ describe("DELETE /api/comments/:comment_id", () => {
     return request(app).delete("/api/comments/22").expect(204);
   });
   test("Deletes a row", () => {
-        return request(app).delete("/api/comments/21").expect(204)
+    return request(app)
+      .delete("/api/comments/21")
+      .expect(204)
       .then(() => {
-        return db.query(`SELECT * FROM comments WHERE comments.comment_id = $1`, [21])
+        return db.query(
+          `SELECT * FROM comments WHERE comments.comment_id = $1`,
+          [21]
+        );
       })
-      .then(({rows}) => {
-        expect(rows).toEqual([])
+      .then(({ rows }) => {
+        expect(rows).toEqual([]);
       });
   });
   test("returns an appropriate status and error message when given an article that does not exist", () => {
@@ -553,6 +551,41 @@ describe("GET /api/articles (topic query)", () => {
       .then((response) => {
         const result = response.body[0].topic;
         expect(result).toBe("cats");
+      });
+  });
+});
+describe("GET /api/articles/:article_id (comment_count)", () => {
+  test("response code is 200", () => {
+    return request(app).get("/api/articles/1").expect(200);
+  });
+  test("returns an article object", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then((response) => {
+        const result = response.body.article.title;
+        expect(response.body.article.title).toEqual(
+          "Living in the shadow of a great man"
+        );
+      });
+  });
+  test("returns an article object with comment_count property", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then((response) => {
+        const articleKeys = Object.keys(response.body.article);
+        expect(articleKeys.includes("comment_count")).toEqual(true);
+      });
+  });
+  test("returns an article object with comment_count property", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then((response) => {
+        const result = response.body.article.title;
+        const expected = "comment_count";
+        expect(response.body.article.comment_count).toEqual(11);
       });
   });
 });
