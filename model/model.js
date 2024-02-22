@@ -22,10 +22,18 @@ function getAllEndpoints() {
 
 function selectArticleById(articleId) {
   const query = `
-    SELECT *
+    SELECT CAST(COUNT(comments.article_id)AS INT) AS comment_count,
+    articles.article_id, 
+    articles.title, 
+    articles.topic, 
+    articles.author, 
+    articles.created_at, 
+    articles.votes, 
+    articles.article_img_url
     FROM articles
-    WHERE article_id = $1
-    ;`;
+    JOIN comments ON articles.article_id = comments.article_id
+    WHERE articles.article_id = $1
+    GROUP BY articles.article_id `;
 
   return db
     .query(query, [articleId])
