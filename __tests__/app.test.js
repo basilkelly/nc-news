@@ -546,4 +546,13 @@ describe("GET /api/articles (topic query)", () => {
         expect(result).toBe("Bad request");
       });
   });
+  test("returned article has a topic matching the requested topic", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then((response) => {
+        const result = response.body[0].topic;
+        expect(result).toBe("cats");
+      });
+  });
 });
