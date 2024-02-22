@@ -7,6 +7,7 @@ const {
   addArticleComment,
   updateArticle,
   removeComment,
+  checkComment,
   SelectAllComments,
   selectAllUsers,
 } = require("../model/model");
@@ -44,7 +45,8 @@ function getArticle(request, response, next) {
     .catch(next);
 }
 function getArticles(request, response, next) {
-  selectAllArticles()
+  const { topic } = request.query;
+  selectAllArticles(topic)
     .then((result) => {
       response.status(200).send(result);
     })
@@ -83,9 +85,9 @@ function patchArticle(request, response, next) {
 function deleteComment(request, response, next) {
   const commentId = request.params.comment_id;
 
-  removeComment(commentId)
+  Promise.all([checkComment(commentId), removeComment(commentId)])
     .then(() => {
-      response.status(204).send({ msg: "no content" });
+      response.status(204).send({ msg: "No content" });
     })
     .catch(next);
 }

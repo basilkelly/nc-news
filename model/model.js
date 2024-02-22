@@ -1,5 +1,6 @@
 const db = require("../db/connection");
 const { forEach } = require("../db/data/test-data/articles");
+const topics = require("../db/data/test-data/topics");
 const fs = require("fs").promises;
 
 function selectAllTopics() {
@@ -36,10 +37,15 @@ function selectArticleById(articleId) {
       return data.rows[0];
     });
 }
-function selectAllArticles() {
-  return db
-    .query(
-      `SELECT COUNT(comments.article_id) AS comment_count,
+function selectAllArticles(topic) {
+  if (topic) {
+    const allowedTopics = ["paper", "cats", "mitch"];
+    if (!allowedTopics.includes(topic)) {
+      return Promise.reject({ status: 400, msg: "Bad request" });
+    }
+  }
+
+  let queryString = `SELECT COUNT(comments.article_id) AS comment_count,
   articles.article_id, 
   articles.title, 
   articles.topic, 
@@ -48,14 +54,24 @@ function selectAllArticles() {
   articles.votes, 
   articles.article_img_url
   FROM articles
-  JOIN comments ON articles.article_id = comments.article_id 
-  GROUP BY articles.article_id 
-  ORDER BY articles.created_at DESC;`
-    )
+  JOIN comments ON articles.article_id = comments.article_id `;
 
-    .then((result) => {
-      return result.rows;
-    });
+  let queryValues = [];
+  if (topic) {
+    queryString += ` WHERE articles.topic = $1`;
+    queryValues.push(topic);
+  }
+
+  queryString += ` 
+GROUP BY articles.article_id 
+ORDER BY articles.created_at DESC`;
+
+  return db.query(queryString, queryValues).then((result) => {
+    if (result.rowCount === 0) {
+      return Promise.reject({ status: 404, msg: "not found" });
+    }
+    return result.rows;
+  });
 }
 
 function SelectArticleComments(articleId) {
@@ -117,16 +133,20 @@ function updateArticle(articleId, updateRequest) {
       return response.rows[0];
     });
 }
-
-function removeComment(commentId) {
-  const ValidCommentNum = Number(commentId);
-  const query = `DELETE FROM comments WHERE comment_id = $1 RETURNING *;`;
-  return db.query(query, [ValidCommentNum]).then((result) => {
+function checkComment(commentId) {
+  const comment = commentId;
+  const query = `SELECT * FROM comments WHERE comment_id = $1`;
+  return db.query(query, [comment]).then((result) => {
     if (result.rowCount === 0) {
       return Promise.reject({ status: 404, msg: "not found" });
     }
-    return result.rows[0];
+    return result.rows;
   });
+}
+function removeComment(commentId) {
+  const validCommentNum = commentId;
+  const query = `DELETE FROM comments WHERE comment_id = $1`;
+  return db.query(query, [validCommentNum]);
 }
 function SelectAllComments() {
   const query = `SELECT * FROM comments;`;
@@ -152,4 +172,5 @@ module.exports = {
   removeComment,
   SelectAllComments,
   selectAllUsers,
+  checkComment,
 };
