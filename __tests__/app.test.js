@@ -72,7 +72,7 @@ describe("GET /api", () => {
       .get("/api")
       .expect(200)
       .then((response) => {
-        expect(typeof response.body).toEqual("object");
+        expect(typeof response.body.api).toEqual("object");
       });
   });
   test("returns value of endponts.json file", () => {
@@ -80,7 +80,7 @@ describe("GET /api", () => {
       .get("/api")
       .expect(200)
       .then((response) => {
-        expect(response.body).toEqual(endpointsJson);
+        expect(response.body.api).toEqual(endpointsJson);
       });
   });
 });

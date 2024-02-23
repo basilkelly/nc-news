@@ -32,8 +32,8 @@ function getTopics(request, response) {
 }
 
 function getApi(request, response) {
-  getAllEndpoints().then((result) => {
-    response.status(200).send(result);
+  getAllEndpoints().then((api) => {
+    response.status(200).send({api});
   });
 }
 
