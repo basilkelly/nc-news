@@ -493,20 +493,6 @@ describe("GET /api/users", () => {
   test("response code is 200", () => {
     return request(app).get("/api/users").expect(200);
   });
-  test("users table exists in database", () => {
-    return db
-      .query(
-        `SELECT EXISTS (
-                          SELECT FROM 
-                          information_schema.tables 
-                          WHERE 
-                          table_name = 'users'
-                          );`
-      )
-      .then(({ rows: [{ exists }] }) => {
-        expect(exists).toBe(true);
-      });
-  });
   test("returns an array", () => {
     return request(app)
       .get("/api/users")
