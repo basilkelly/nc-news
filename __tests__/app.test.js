@@ -583,8 +583,7 @@ describe("GET /api/articles/:article_id (comment_count)", () => {
       .get("/api/articles/1")
       .expect(200)
       .then((response) => {
-        const articleKeys = Object.keys(response.body.article);
-        expect(articleKeys.includes("comment_count")).toEqual(true);
+        expect(response.body.article.hasOwnProperty("comment_count")).toEqual(true);
       });
   });
   test("returns an article object with comment_count property", () => {
@@ -592,8 +591,6 @@ describe("GET /api/articles/:article_id (comment_count)", () => {
       .get("/api/articles/1")
       .expect(200)
       .then((response) => {
-        const result = response.body.article.title;
-        const expected = "comment_count";
         expect(response.body.article.comment_count).toEqual(11);
       });
   });
