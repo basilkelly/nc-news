@@ -26,22 +26,22 @@ app.patch("/api/articles/:article_id", patchArticle);
 app.delete("/api/comments/:comment_id", deleteComment);
 app.get("/api/users", getUsers);
 
-app.use((err, req, res, next) => {
-  if (err.code === "22P02") {
-    return res.status(400).send({ msg: "Bad request" });
+app.use((error, request, response, next) => {
+  if (error.code === "22P02") {
+    return response.status(400).send({ msg: "Bad request" });
   }
-  if (err.code === "23502") {
-    return res.status(400).send({ msg: "Bad request" });
+  if (error.code === "23502") {
+    return response.status(400).send({ msg: "Bad request" });
   }
-  if (err.code === "23503") {
-    return res.status(400).send({ msg: "Bad request" });
-  } else next(err);
+  if (error.code === "23503") {
+    return response.status(400).send({ msg: "Bad request" });
+  } else next(error);
 });
 
-app.use((err, req, res, next) => {
-  if (err.status && err.msg) {
-    return res.status(err.status).send({ msg: err.msg });
-  } else next(err);
+app.use((error, request, response, next) => {
+  if (error.status && error.msg) {
+    return response.status(error.status).send({ msg: error.msg });
+  } else next(error);
 });
 
 app.use((error, request, response, next) => {

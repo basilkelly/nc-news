@@ -35,8 +35,8 @@ describe("GET ./api/topics", () => {
   test("returns array", () => {
     return request(app)
       .get("/api/topics")
-      .then((res) => {
-        expect(Array.isArray(res.body.topics)).toBe(true);
+      .then((response) => {
+        expect(Array.isArray(response.body.topics)).toBe(true);
       });
   });
   test("Returned array contains correct number of objects", () => {
@@ -154,16 +154,16 @@ describe("GET /api/articles", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
-      .then((res) => {
-        expect(Array.isArray(res.body)).toBe(true);
+      .then((response) => {
+        expect(Array.isArray(response.body)).toBe(true);
       });
   });
   test("first article does not return a body property", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
-      .then((res) => {
-        const actual = res.body[0].body;
+      .then((response) => {
+        const actual = response.body[0].body;
         expect(actual).toBe(undefined);
       });
   });
@@ -171,9 +171,9 @@ describe("GET /api/articles", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
-      .then((res) => {
+      .then((response) => {
         let actual = true;
-        res.body.forEach((element) => {
+        response.body.forEach((element) => {
           if (element.body) {
             actual = true;
           } else {
@@ -187,8 +187,8 @@ describe("GET /api/articles", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
-      .then((res) => {
-        const actual = res.body;
+      .then((response) => {
+        const actual = response.body;
         const firstArticle = actual.filter(
           (article) => article.article_id === 1
         );
@@ -200,8 +200,8 @@ describe("GET /api/articles", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
-      .then((res) => {
-        res.body.forEach((element) => {
+      .then((response) => {
+        response.body.forEach((element) => {
           if (element.comment_count.length === 0) {
             IsCommentCountPresent = false;
           } else {
@@ -369,8 +369,8 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(patch)
       .expect(200)
 
-      .then((res) => {
-        expect(res.body.votes).toBe(1);
+      .then((response) => {
+        expect(response.body.votes).toBe(1);
       });
   });
   test("returns an appropriate status and error message when given an invalid vote value", () => {
@@ -381,8 +381,8 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(patch)
       .expect(400)
 
-      .then((res) => {
-        expect(res.body.msg).toBe("Bad request");
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
       });
   });
   test("returns error when passed article id that doesnt exist", () => {
@@ -404,8 +404,8 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(patch)
       .expect(400)
 
-      .then((res) => {
-        expect(res.body.msg).toBe("Bad request");
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
       });
   });
   test("Succesfully patched articles database when using negative numbers", () => {
@@ -416,8 +416,8 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(patch)
       .expect(200)
 
-      .then((res) => {
-        expect(res.body.votes).toBe(-1);
+      .then((response) => {
+        expect(response.body.votes).toBe(-1);
       });
   });
   test("Succesfully increments votes based on current vote value in article", () => {
@@ -428,8 +428,8 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(patch)
       .expect(200)
 
-      .then((res) => {
-        expect(res.body.votes).toBe(101);
+      .then((response) => {
+        expect(response.body.votes).toBe(101);
       });
   });
   test("returns an article object with expected keys", () => {
@@ -475,8 +475,8 @@ describe("DELETE /api/comments/:comment_id", () => {
     return request(app)
       .delete("/api/comments/50")
       .expect(404)
-      .then((res) => {
-        expect(res.body.msg).toBe("not found");
+      .then((response) => {
+        expect(response.body.msg).toBe("not found");
       });
   });
   test("returns an appropriate status and error message when given an invalid comment id", () => {
@@ -496,8 +496,8 @@ describe("GET /api/users", () => {
   test("returns an array", () => {
     return request(app)
       .get("/api/users")
-      .then((res) => {
-        expect(Array.isArray(res.body.users)).toBe(true);
+      .then((response) => {
+        expect(Array.isArray(response.body.users)).toBe(true);
       });
   });
   test("Returned array contains correct number of objects", () => {
@@ -572,7 +572,6 @@ describe("GET /api/articles/:article_id (comment_count)", () => {
       .get("/api/articles/1")
       .expect(200)
       .then((response) => {
-        const result = response.body.article.title;
         expect(response.body.article.title).toEqual(
           "Living in the shadow of a great man"
         );
@@ -583,7 +582,9 @@ describe("GET /api/articles/:article_id (comment_count)", () => {
       .get("/api/articles/1")
       .expect(200)
       .then((response) => {
-        expect(response.body.article.hasOwnProperty("comment_count")).toEqual(true);
+        expect(response.body.article.hasOwnProperty("comment_count")).toEqual(
+          true
+        );
       });
   });
   test("returns an article object with comment_count property", () => {
