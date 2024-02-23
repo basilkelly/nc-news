@@ -572,7 +572,6 @@ describe("GET /api/articles/:article_id (comment_count)", () => {
       .get("/api/articles/1")
       .expect(200)
       .then((response) => {
-        const result = response.body.article.title;
         expect(response.body.article.title).toEqual(
           "Living in the shadow of a great man"
         );
