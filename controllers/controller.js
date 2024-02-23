@@ -25,16 +25,18 @@ module.exports = {
   getUsers,
 };
 
-function getTopics(request, response) {
+function getTopics(request, response, next) {
   selectAllTopics().then((topics) => {
     response.status(200).send({ topics });
-  });
+  })
+  .catch(next)
 }
 
-function getApi(request, response) {
+function getApi(request, response, next) {
   getAllEndpoints().then((api) => {
     response.status(200).send({api});
-  });
+  })
+  .catch(next)
 }
 
 function getArticle(request, response, next) {

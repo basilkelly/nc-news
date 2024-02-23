@@ -4,7 +4,6 @@ const db = require("../db/connection.js");
 const request = require("supertest");
 const app = require("../app/app.js");
 const endpointsJson = require("../endpoints.json");
-const { filter } = require("../db/data/test-data/articles.js");
 
 beforeAll(() => {
   return seed(data);

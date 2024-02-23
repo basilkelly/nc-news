@@ -1,7 +1,10 @@
+const { dirname } = require("path");
 const db = require("../db/connection");
 const { forEach } = require("../db/data/test-data/articles");
 const topics = require("../db/data/test-data/topics");
 const fs = require("fs").promises;
+
+
 
 function selectAllTopics() {
   const query = `SELECT * FROM topics;`;
@@ -10,14 +13,16 @@ function selectAllTopics() {
   });
 }
 function getAllEndpoints() {
+  const moduleDir = `${__dirname}`
+  const rootDir = moduleDir.slice(0, -6); 
   return fs
     .readFile(
-      `/home/basil/northcoders/backend/be-nc-news/endpoints.json`,
+      `${rootDir}/endpoints.json`,
       "utf-8"
     )
     .then((data) => {
       return JSON.parse(data);
-    });
+    })
 }
 
 function selectArticleById(articleId) {
