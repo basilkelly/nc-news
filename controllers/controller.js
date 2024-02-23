@@ -8,7 +8,6 @@ const {
   updateArticle,
   removeComment,
   checkComment,
-  SelectAllComments,
   selectAllUsers,
   checkTopic,
 } = require("../model/model");
@@ -21,7 +20,6 @@ module.exports = {
   postComment,
   patchArticle,
   deleteComment,
-  getComments,
   getUsers,
 };
 
@@ -97,13 +95,6 @@ function deleteComment(request, response, next) {
     .catch(next);
 }
 
-function getComments(request, response, next) {
-  SelectAllComments()
-    .then((comments) => {
-      response.status(200).send({ comments });
-    })
-    .catch(next);
-}
 function getUsers(request, response, next) {
   selectAllUsers()
     .then((users) => {
