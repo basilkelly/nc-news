@@ -286,7 +286,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(typeof response.body).toEqual("object");
       });
   });
-  test("returns an object with expected keys", () => {
+  test("returns an object with expected keys and values", () => {
     const post = { username: "butter_bridge", body: "hello" };
 
     return request(app)
@@ -294,12 +294,13 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(post)
       .expect(201)
       .then((response) => {
-        const ActualkeysArray = Object.keys(response.body);
-        expect(ActualkeysArray.includes("comment_id")).toEqual(true);
-        expect(ActualkeysArray.includes("body")).toEqual(true);
-        expect(ActualkeysArray.includes("article_id")).toEqual(true);
-        expect(ActualkeysArray.includes("author")).toEqual(true);
-        expect(ActualkeysArray.includes("votes")).toEqual(true);
+        expect(response.body).toMatchObject({
+          comment_id: expect.any(Number),
+          body: expect.any(String),
+          article_id: expect.any(Number),
+          author: expect.any(String),
+          votes: expect.any(Number),
+        })
       });
   });
   test("returns expected object for a given post", () => {
@@ -431,7 +432,7 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(response.body.votes).toBe(101);
       });
   });
-  test("returns an article object with expected keys", () => {
+  test("returns an article object with expected keys and value type", () => {
     const patch = { inc_votes: 0 };
 
     return request(app)
@@ -439,15 +440,18 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(patch)
       .expect(200)
       .then((response) => {
-        const ActualkeysArray = Object.keys(response.body);
-        expect(ActualkeysArray.includes("article_id")).toEqual(true);
-        expect(ActualkeysArray.includes("title")).toEqual(true);
-        expect(ActualkeysArray.includes("topic")).toEqual(true);
-        expect(ActualkeysArray.includes("author")).toEqual(true);
-        expect(ActualkeysArray.includes("body")).toEqual(true);
-        expect(ActualkeysArray.includes("created_at")).toEqual(true);
-        expect(ActualkeysArray.includes("votes")).toEqual(true);
-        expect(ActualkeysArray.includes("article_img_url")).toEqual(true);
+        expect(response.body).toMatchObject({
+          article_id: expect.any(Number),
+          title: expect.any(String),
+          topic: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String)
+
+        }
+        )
       });
   });
 });
@@ -508,15 +512,18 @@ describe("GET /api/users", () => {
         expect(result.length).toBe(4);
       });
   });
-  test("returned user object has correct keys", () => {
+  test("returned user object has correct keys and value type", () => {
     return request(app)
       .get("/api/users")
       .expect(200)
       .then((response) => {
-        const ActualkeysArray = Object.keys(response.body.users[0]);
-        expect(ActualkeysArray.includes("username")).toEqual(true);
-        expect(ActualkeysArray.includes("name")).toEqual(true);
-        expect(ActualkeysArray.includes("avatar_url")).toEqual(true);
+        response.body.users.forEach(element => {
+          expect(element).toMatchObject({
+          username: expect.any(String),
+          name:expect.any(String),
+          avatar_url: expect.any(String)
+        });
+        });
       });
   });
 });
