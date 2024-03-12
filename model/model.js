@@ -31,7 +31,8 @@ function selectArticleById(articleId) {
     articles.article_id, 
     articles.title, 
     articles.topic, 
-    articles.author, 
+    articles.author,
+    articles.body,
     articles.created_at, 
     articles.votes, 
     articles.article_img_url
