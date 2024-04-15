@@ -10,6 +10,7 @@ const {
   checkComment,
   selectAllUsers,
   checkTopic,
+  checkSortBy,
 } = require("../model/model");
 module.exports = {
   getTopics,
@@ -24,17 +25,19 @@ module.exports = {
 };
 
 function getTopics(request, response, next) {
-  selectAllTopics().then((topics) => {
-    response.status(200).send({ topics });
-  })
-  .catch(next)
+  selectAllTopics()
+    .then((topics) => {
+      response.status(200).send({ topics });
+    })
+    .catch(next);
 }
 
 function getApi(request, response, next) {
-  getAllEndpoints().then((api) => {
-    response.status(200).send({api});
-  })
-  .catch(next)
+  getAllEndpoints()
+    .then((api) => {
+      response.status(200).send({ api });
+    })
+    .catch(next);
 }
 
 function getArticle(request, response, next) {
@@ -46,9 +49,16 @@ function getArticle(request, response, next) {
     .catch(next);
 }
 function getArticles(request, response, next) {
+  const query = Object.keys(request.query);
   const { topic } = request.query;
+  const { sort_by } = request.query;
+  const { order } = request.query;
 
-  Promise.all([checkTopic(topic), selectAllArticles(topic)])
+  Promise.all([
+    checkSortBy(sort_by),
+    checkTopic(topic),
+    selectAllArticles(topic, query[0], sort_by, order),
+  ])
     .then((result) => {
       result.reverse();
       response.status(200).send(result[0]);

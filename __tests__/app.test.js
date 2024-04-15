@@ -302,7 +302,7 @@ describe("POST /api/articles/:article_id/comments", () => {
           article_id: expect.any(Number),
           author: expect.any(String),
           votes: expect.any(Number),
-        })
+        });
       });
   });
   test("returns expected object for a given post", () => {
@@ -450,10 +450,8 @@ describe("PATCH /api/articles/:article_id", () => {
           body: expect.any(String),
           created_at: expect.any(String),
           votes: expect.any(Number),
-          article_img_url: expect.any(String)
-
-        }
-        )
+          article_img_url: expect.any(String),
+        });
       });
   });
 });
@@ -519,12 +517,12 @@ describe("GET /api/users", () => {
       .get("/api/users")
       .expect(200)
       .then((response) => {
-        response.body.users.forEach(element => {
+        response.body.users.forEach((element) => {
           expect(element).toMatchObject({
-          username: expect.any(String),
-          name:expect.any(String),
-          avatar_url: expect.any(String)
-        });
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
         });
       });
   });
@@ -601,6 +599,261 @@ describe("GET /api/articles/:article_id (comment_count)", () => {
       .expect(200)
       .then((response) => {
         expect(response.body.article.comment_count).toEqual(11);
+      });
+  });
+});
+describe("GET /api/articles (sorting query) ", () => {
+  test("response code is 200", () => {
+    return request(app).get("/api/articles?sort_by=created_at").expect(200);
+  });
+  test("returns an array", () => {
+    return request(app)
+      .get("/api/articles?sort_by=created_at")
+      .expect(200)
+      .then((response) => {
+        const result = response.body;
+        expect(Array.isArray(result)).toBe(true);
+      });
+  });
+  test("first index of response body votes should have biggest votes value when sorted by votes", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes")
+      .expect(200)
+      .then((response) => {
+        let resultsArr = [];
+        response.body.forEach((element) => {
+          resultsArr.push(element.votes);
+        });
+        const expected = Math.max(...resultsArr);
+        const result = response.body[0].votes;
+        expect(result).toBe(expected);
+      });
+  });
+  test("last index of response body votes should have smallest votes value when sorted by votes", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes")
+      .expect(200)
+      .then((response) => {
+        let resultsArr = [];
+        response.body.forEach((element) => {
+          resultsArr.push(element.votes);
+        });
+        const expected = Math.min(...resultsArr);
+        const result = response.body[response.body.length - 1].votes;
+        expect(result).toBe(expected);
+      });
+  });
+
+  test("first index of response body title should have lowest alphabetical order value when sorted by title is used", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title")
+      .expect(200)
+      .then((response) => {
+        let resultsArr = [];
+        response.body.forEach((element) => {
+          resultsArr.push(element.title);
+        });
+        resultsArr.sort().reverse();
+        const expected = resultsArr[0];
+        const result = response.body[0].title;
+        expect(result).toBe(expected);
+      });
+  });
+  test("last index of response body title should have highest alphabetical order value when sorted by title is used", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title")
+      .expect(200)
+      .then((response) => {
+        let resultsArr = [];
+        response.body.forEach((element) => {
+          resultsArr.push(element.title);
+        });
+        resultsArr.sort();
+        const expected = resultsArr[0];
+        const result = response.body[response.body.length - 1].title;
+        expect(result).toBe(expected);
+      });
+  });
+  test("first index of response body topic should have lowest alphabetical order value when sorted by topic is used", () => {
+    return request(app)
+      .get("/api/articles?sort_by=topic")
+      .expect(200)
+      .then((response) => {
+        let resultsArr = [];
+        response.body.forEach((element) => {
+          resultsArr.push(element.topic);
+        });
+        resultsArr.sort().reverse();
+        const expected = resultsArr[0];
+        const result = response.body[0].topic;
+        expect(result).toBe(expected);
+      });
+  });
+  test("last index of response body topic should have highest alphabetical order value when sorted by topic is used", () => {
+    return request(app)
+      .get("/api/articles?sort_by=topic")
+      .expect(200)
+      .then((response) => {
+        let resultsArr = [];
+        response.body.forEach((element) => {
+          resultsArr.push(element.topic);
+        });
+        resultsArr.sort();
+        const expected = resultsArr[0];
+        const result = response.body[response.body.length - 1].topic;
+        expect(result).toBe(expected);
+      });
+  });
+  test("first index of response body author should have lowest alphabetical order value when sorted by author is used", () => {
+    return request(app)
+      .get("/api/articles?sort_by=author")
+      .expect(200)
+      .then((response) => {
+        let resultsArr = [];
+        response.body.forEach((element) => {
+          resultsArr.push(element.author);
+        });
+        resultsArr.sort().reverse();
+        const expected = resultsArr[0];
+        const result = response.body[0].author;
+        expect(result).toBe(expected);
+      });
+  });
+  test("last index of response body author should have highest alphabetical order value when sorted by author is used", () => {
+    return request(app)
+      .get("/api/articles?sort_by=author")
+      .expect(200)
+      .then((response) => {
+        let resultsArr = [];
+        response.body.forEach((element) => {
+          resultsArr.push(element.author);
+        });
+        resultsArr.sort();
+        const expected = resultsArr[0];
+        const result = response.body[response.body.length - 1].author;
+        expect(result).toBe(expected);
+      });
+  });
+  test("first index of response body comment_count should have biggest number value when sorted by comment_count", () => {
+    return request(app)
+      .get("/api/articles?sort_by=comment_count")
+      .expect(200)
+      .then((response) => {
+        let resultsArr = [];
+        response.body.forEach((element) => {
+          resultsArr.push(element.comment_count);
+        });
+        const expected = Math.max(...resultsArr).toString();
+        const result = response.body[0].comment_count;
+        expect(result).toBe(expected);
+      });
+  });
+  test("last index of response body comment_count should have smallest number value when sorted by comment_count", () => {
+    return request(app)
+      .get("/api/articles?sort_by=comment_count")
+      .expect(200)
+      .then((response) => {
+        let resultsArr = [];
+        response.body.forEach((element) => {
+          resultsArr.push(element.comment_count);
+        });
+        const expected = Math.min(...resultsArr).toString();
+        const result = response.body[response.body.length - 1].comment_count;
+        expect(result).toBe(expected);
+      });
+  });
+  test("first index of response body created_at should have latest date value when sorted by created_at", () => {
+    return request(app)
+      .get("/api/articles?sort_by=created_at")
+      .expect(200)
+      .then((response) => {
+        let resultsArr = [];
+        response.body.forEach((element) => {
+          resultsArr.push(element.created_at);
+        });
+        resultsArr.sort().reverse();
+        const expected = resultsArr[0];
+        const result = response.body[0].created_at;
+        expect(result).toBe(expected);
+      });
+  });
+  test("last index of response body created_at should have oldest date value when sorted by created_at", () => {
+    return request(app)
+      .get("/api/articles?sort_by=created_at")
+      .expect(200)
+      .then((response) => {
+        let resultsArr = [];
+        response.body.forEach((element) => {
+          resultsArr.push(element.created_at);
+        });
+        resultsArr.sort();
+        const expected = resultsArr[0];
+        const result = response.body[response.body.length - 1].created_at;
+        expect(result).toBe(expected);
+      });
+  });
+
+  test("returns error if given an invalid sort_by query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=helloworld")
+      .expect(404)
+      .then((response) => {
+        const result = response.body.msg;
+        expect(result).toBe("not found");
+      });
+  });
+});
+describe("GET /api/articles (order query) ", () => {
+  test("response code is 200", () => {
+    return request(app).get("/api/articles?order=asc").expect(200);
+  });
+  test("returns an array", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then((response) => {
+        const result = response.body;
+        expect(Array.isArray(result)).toBe(true);
+      });
+  });
+  test("order by query desc should return body array with newest articles first", () => {
+    return request(app)
+      .get("/api/articles?order=desc")
+      .expect(200)
+      .then((response) => {
+        let resultsArr = [];
+        response.body.forEach((element) => {
+          resultsArr.push(element.created_at);
+        });
+
+        resultsArr.sort().reverse();
+        const expected = resultsArr[0];
+        const result = response.body[0].created_at;
+        expect(result).toBe(expected);
+      });
+  });
+  test("order by query asc should return body array with oldest articles first", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then((response) => {
+        let resultsArr = [];
+        response.body.forEach((element) => {
+          resultsArr.push(element.created_at);
+        });
+        resultsArr.sort();
+        const expected = resultsArr[0];
+        const result = response.body[0].created_at;
+        expect(result).toBe(expected);
+      });
+  });
+  test("should return error if given invalid order by query", () => {
+    return request(app)
+      .get("/api/articles?order=hello")
+      .expect(404)
+      .then((response) => {
+        const result = response.body.msg;
+        expect(result).toBe("not found");
       });
   });
 });
