@@ -113,8 +113,70 @@
           "author": "butter_bridge",
           "body": "There will never be enough articles about Mitch!",
           "created_at": 1602419040000,
-          "article_img_url":
-            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        }
+      ]
+    }
+  },
+  "GET /api/articles?sort_by": {
+    "description": "serves an array of all articles sorted by a given article column",
+    "queries": [
+      "comment_count",
+      "title",
+      "topic",
+      "author",
+      "created_at",
+      "votes"
+    ],
+    "exampleResponse": {
+      "articles": [
+        {
+          "title": "A",
+          "topic": "mitch",
+          "author": "icellusedkars",
+          "body": "Delicious tin of cat food",
+          "created_at": 1602986400000,
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        },
+        {
+          "title": "Z",
+          "topic": "mitch",
+          "author": "icellusedkars",
+          "body": "I was hungry.",
+          "created_at": 1578406080000,
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        }
+      ]
+    }
+  },
+  "GET /api/articles?order": {
+    "description": "serves an array of all articles in ascending or descending order, articles order is defaulted to descending",
+    "queries": ["asc", "desc"],
+    "exampleResponse": {
+      "articles": [
+        {
+          "title": "A",
+          "topic": "mitch",
+          "author": "icellusedkars",
+          "body": "Delicious tin of cat food",
+          "created_at": 1602986400000,
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        },
+        {
+          "title": "UNCOVERED: catspiracy to bring down democracy",
+          "topic": "cats",
+          "author": "rogersop",
+          "body": "Bastet walks amongst us, and the cats are taking arms!",
+          "created_at": 1596464040000,
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        },
+        {
+          "title": "Student SUES Mitch!",
+          "topic": "mitch",
+          "author": "rogersop",
+          "body": "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+          "created_at": 1588731240000,
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
         }
       ]
     }

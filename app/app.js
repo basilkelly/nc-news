@@ -37,6 +37,7 @@ app.use((error, request, response, next) => {
   if (error.code === "23503") {
     return response.status(400).send({ msg: "Bad request" });
   } else next(error);
+  
 });
 
 app.use((error, request, response, next) => {
@@ -47,5 +48,5 @@ app.use((error, request, response, next) => {
 
 app.use((error, request, response, next) => {
   return response.status(500).send({ msg: "internal server error" });
-});
+}); 
 module.exports = app;

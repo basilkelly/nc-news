@@ -1,10 +1,5 @@
-const { dirname } = require("path");
 const db = require("../db/connection");
-const { forEach } = require("../db/data/test-data/articles");
-const topics = require("../db/data/test-data/topics");
 const fs = require("fs").promises;
-
-
 
 function selectAllTopics() {
   const query = `SELECT * FROM topics;`;
@@ -13,16 +8,11 @@ function selectAllTopics() {
   });
 }
 function getAllEndpoints() {
-  const moduleDir = `${__dirname}`
-  const rootDir = moduleDir.slice(0, -6); 
-  return fs
-    .readFile(
-      `${rootDir}/endpoints.json`,
-      "utf-8"
-    )
-    .then((data) => {
-      return JSON.parse(data);
-    })
+  const moduleDir = `${__dirname}`;
+  const rootDir = moduleDir.slice(0, -6);
+  return fs.readFile(`${rootDir}/endpoints.json`, "utf-8").then((data) => {
+    return JSON.parse(data);
+  });
 }
 
 function selectArticleById(articleId) {
@@ -64,7 +54,41 @@ function checkTopic(topic) {
   }
   return true;
 }
-function selectAllArticles(topic) {
+function checkSortBy(sortByQuery) {
+  const sortByColumn = sortByQuery;
+  if (sortByColumn != undefined && sortByColumn != "comment_count") {
+    const query = `SELECT * 
+    FROM information_schema.columns 
+    WHERE table_name='articles' and column_name=$1;`;
+    return db.query(query, [sortByColumn]).then((result) => {
+      if (result.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "not found" });
+      }
+      return result.rows;
+    });
+  }
+  return true;
+}
+function selectAllArticles(topic, queryType, sortquery, orderQuery) {
+  let order = "DESC";
+  if (
+    orderQuery !== undefined &&
+    orderQuery !== "asc" &&
+    orderQuery !== "desc"
+  ) {
+    return Promise.reject({ status: 404, msg: "not found" });
+  }
+  if (orderQuery === "asc") {
+    order = "ASC";
+  }
+  const allowedSortQueries = [
+    "comment_count",
+    "title",
+    "topic",
+    "author",
+    "created_at",
+    "votes",
+  ];
   let queryString = `SELECT COUNT(comments.article_id) AS comment_count,
   articles.article_id, 
   articles.title, 
@@ -77,15 +101,26 @@ function selectAllArticles(topic) {
   JOIN comments ON articles.article_id = comments.article_id `;
 
   let queryValues = [];
-  if (topic) {
+  if (topic && queryType === "topic") {
     queryString += ` WHERE articles.topic = $1`;
     queryValues.push(topic);
   }
-
   queryString += ` 
-GROUP BY articles.article_id 
-ORDER BY articles.created_at DESC`;
+GROUP BY articles.article_id`;
 
+  let sort = "created_at";
+  if (queryType === "sort_by" && allowedSortQueries.includes(sortquery)) {
+    if (sortquery != "comment_count") {
+      sort = sortquery;
+      queryString += ` ORDER BY articles.${sort} ${order}`;
+    }
+    if (sortquery === "comment_count") {
+      sort = sortquery;
+      queryString += ` ORDER BY ${sort} ${order}`;
+    }
+  } else {
+    queryString += ` ORDER BY created_at ${order}`;
+  }
   return db.query(queryString, queryValues).then((result) => {
     return result.rows;
   });
@@ -184,4 +219,5 @@ module.exports = {
   selectAllUsers,
   checkComment,
   checkTopic,
+  checkSortBy,
 };
