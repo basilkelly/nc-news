@@ -1,31 +1,20 @@
 const express = require("express");
-const {
-  getTopics,
-  getApi,
-  getArticle,
-  getArticles,
-  getArticleComments,
-  postComment,
-  patchArticle,
-  deleteComment,
-  getUsers,
-} = require("../controllers/controller");
+const apiRouter = require("./routes/api.router.js");
+const articlesRouter = require("./routes/articles.router.js");
+const topicsRouter = require("./routes/topics.router.js");
+const usersRouter = require("./routes/users.router.js");
+const commentsRouter = require("./routes/comments.router.js");
 
-const cors = require('cors');
+const cors = require("cors");
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-
-app.get("/api/topics", getTopics);
-app.get("/api", getApi);
-app.get("/api/articles/:article_id", getArticle);
-app.get("/api/articles", getArticles);
-app.get("/api/articles/:article_id/comments", getArticleComments);
-app.post("/api/articles/:article_id/comments", postComment);
-app.patch("/api/articles/:article_id", patchArticle);
-app.delete("/api/comments/:comment_id", deleteComment);
-app.get("/api/users", getUsers);
+app.use(apiRouter);
+app.use("/api/articles", articlesRouter);
+app.use("/api/topics", topicsRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/comments", commentsRouter);
 
 app.use((error, request, response, next) => {
   if (error.code === "22P02") {
@@ -37,7 +26,6 @@ app.use((error, request, response, next) => {
   if (error.code === "23503") {
     return response.status(400).send({ msg: "Bad request" });
   } else next(error);
-  
 });
 
 app.use((error, request, response, next) => {
@@ -48,5 +36,5 @@ app.use((error, request, response, next) => {
 
 app.use((error, request, response, next) => {
   return response.status(500).send({ msg: "internal server error" });
-}); 
+});
 module.exports = app;
