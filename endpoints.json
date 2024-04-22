@@ -98,6 +98,12 @@
           "username": "butter_bridge",
           "name": "jonny",
           "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        },
+        {
+          "username": "grumpy19",
+          "name": "Paul Grump",
+          "avatar_url":
+            "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013"
         }
       ]
     }
@@ -179,6 +185,19 @@
           "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
         }
       ]
+    }
+  },
+  "GET /api/users/:username": {
+    "description": "serves an object of a specific user for a given username",
+    "queries": [],
+    "exampleResponse": {
+      "users": 
+      {
+        "username": "grumpy19",
+        "name": "Paul Grump",
+        "avatar_url":
+          "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013"
+      }
     }
   }
 }
