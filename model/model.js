@@ -207,6 +207,17 @@ function selectAllUsers() {
   });
 }
 
+function selectUserByUsername(username) {
+  const user = username;
+  const query = `SELECT * FROM users WHERE username = $1`;
+  return db.query(query, [user]).then((result) => {
+    if (result.rowCount === 0) {
+      return Promise.reject({ status: 404, msg: "not found" });
+    }
+    return result.rows[0];
+  });
+}
+
 module.exports = {
   selectAllTopics,
   getAllEndpoints,
@@ -220,4 +231,5 @@ module.exports = {
   checkComment,
   checkTopic,
   checkSortBy,
+  selectUserByUsername,
 };

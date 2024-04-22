@@ -857,3 +857,48 @@ describe("GET /api/articles (order query) ", () => {
       });
   });
 });
+describe("GET /api/users/:username", () => {
+  test("response code is 200", () => {
+    return request(app).get("/api/users/butter_bridge").expect(200);
+  });
+  test("should return an object", () => {
+    return request(app)
+      .get("/api/users/butter_bridge")
+      .then((response) => {
+        expect(typeof response.body).toBe("object");
+        expect(Array.isArray(response.body)).toBe(false);
+        expect(response.body).not.toBeNull();
+      });
+  });
+  test("should return correct user object properties", () => {
+    return request(app)
+      .get("/api/users/butter_bridge")
+      .then((response) => {
+        expect(response.body).toMatchObject({
+          username: expect.any(String),
+          avatar_url: expect.any(String),
+          name: expect.any(String),
+        });
+      });
+  });
+  test("should return correct user data for requested user", () => {
+    return request(app)
+      .get("/api/users/butter_bridge")
+      .then((response) => {
+        expect(response.body).toMatchObject({
+          username: "butter_bridge",
+          avatar_url:
+            "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+          name: "jonny",
+        });
+      });
+  });
+  test("returns an appropriate status and error message when given a non existent username value", () => {
+    return request(app)
+      .get("/api/users/helloworld")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("not found");
+      });
+  });
+});

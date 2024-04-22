@@ -11,6 +11,7 @@ const {
   selectAllUsers,
   checkTopic,
   checkSortBy,
+  selectUserByUsername,
 } = require("../model/model");
 module.exports = {
   getTopics,
@@ -22,6 +23,7 @@ module.exports = {
   patchArticle,
   deleteComment,
   getUsers,
+  getUserByUsername,
 };
 
 function getTopics(request, response, next) {
@@ -109,6 +111,15 @@ function getUsers(request, response, next) {
   selectAllUsers()
     .then((users) => {
       response.status(200).send({ users });
+    })
+    .catch(next);
+}
+
+function getUserByUsername(request, response, next) {
+  const username = request.params.username;
+  selectUserByUsername(username)
+    .then((user) => {
+      response.status(200).send(user);
     })
     .catch(next);
 }
