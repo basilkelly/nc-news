@@ -902,3 +902,99 @@ describe("GET /api/users/:username", () => {
       });
   });
 });
+describe('PATCH /api/comments/:comment_id', () => {
+    test('response code is 200', () => {
+      const patch = { inc_votes: 1 };
+
+    return request(app).patch("/api/comments/1").send(patch).expect(200);
+    });
+    test("Succesfully patched comments database", () => {
+      const patch = { inc_votes: 1 };
+  
+      return request(app)
+        .patch("/api/comments/5")
+        .send(patch)
+        .expect(200)
+  
+        .then((response) => {
+          expect(response.body.votes).toBe(1);
+        });
+    });
+    test("returns an appropriate status and error message when given an invalid vote value", () => {
+      const patch = { inc_votes: "hello" };
+  
+      return request(app)
+        .patch("/api/comments/3")
+        .send(patch)
+        .expect(400)
+  
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request");
+        });
+    });
+    test("returns error when passed comment id that doesnt exist", () => {
+      const patch = { inc_votes: 1 };
+  
+      return request(app)
+        .patch("/api/comments/99999")
+        .send(patch)
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("not found");
+        });
+    });
+    test("returns error when passed an invalid comment id", () => {
+      const patch = { inc_votes: 1 };
+  
+      return request(app)
+        .patch("/api/comments/acomment")
+        .send(patch)
+        .expect(400)
+  
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request");
+        });
+    });
+    test("Succesfully patched comments database when using negative numbers", () => {
+      const patch = { inc_votes: -1 };
+  
+      return request(app)
+        .patch("/api/comments/6")
+        .send(patch)
+        .expect(200)
+  
+        .then((response) => {
+          expect(response.body.votes).toBe(-1);
+        });
+    });
+    test("Succesfully increments votes based on current vote value in comment", () => {
+      const patch = { inc_votes: 1 };
+  
+      return request(app)
+        .patch("/api/comments/5")
+        .send(patch)
+        .expect(200)
+  
+        .then((response) => {
+          expect(response.body.votes).toBe(2);
+        });
+    });
+    test("returns a comments object with expected keys and value type", () => {
+      const patch = { inc_votes: 0 };
+  
+      return request(app)
+        .patch("/api/comments/1")
+        .send(patch)
+        .expect(200)
+        .then((response) => {
+          expect(response.body).toMatchObject({
+            article_id: expect.any(Number),
+            comment_id: expect.any(Number),
+            author: expect.any(String),
+            body: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+          });
+        });
+    });
+  });
