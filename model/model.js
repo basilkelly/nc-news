@@ -218,6 +218,29 @@ function selectUserByUsername(username) {
   });
 }
 
+function updateComment(commentId, updateRequest) {
+  const voteIncrementNum = Number(Object.values(updateRequest));
+
+  const select = `
+  SELECT *
+  FROM comments
+  WHERE comment_id = $1
+  ;`;
+  const query = `UPDATE comments SET votes = votes + $1 WHERE comment_id = $2;`;
+
+  return db
+    .query(query, [voteIncrementNum, commentId])
+    .then(() => {
+      return db.query(select, [commentId]);
+    })
+    .then((response) => {
+      if (response.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "not found" });
+      }
+      return response.rows[0];
+    });
+}
+
 module.exports = {
   selectAllTopics,
   getAllEndpoints,
@@ -232,4 +255,5 @@ module.exports = {
   checkTopic,
   checkSortBy,
   selectUserByUsername,
+  updateComment,
 };

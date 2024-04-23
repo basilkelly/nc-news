@@ -102,8 +102,7 @@
         {
           "username": "grumpy19",
           "name": "Paul Grump",
-          "avatar_url":
-            "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013"
+          "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013"
         }
       ]
     }
@@ -191,13 +190,23 @@
     "description": "serves an object of a specific user for a given username",
     "queries": [],
     "exampleResponse": {
-      "users": 
-      {
+      "users": {
         "username": "grumpy19",
         "name": "Paul Grump",
-        "avatar_url":
-          "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013"
+        "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013"
       }
+    }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "serves an object of an updated comment with updated vote value, based on integer value in request body object, for a specified comment. vote should be incremented on vote value currently on comment",
+    "queries": [],
+    "exampleResponse": {
+      "comment_id": 11,
+      "body": "Ambidextrous marsupial",
+      "article_id": 3,
+      "author": "icellusedkars",
+      "votes": 1,
+      "created_at": "2020-09-19T23:10:00.000Z"
     }
   }
 }

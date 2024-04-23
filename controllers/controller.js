@@ -12,6 +12,7 @@ const {
   checkTopic,
   checkSortBy,
   selectUserByUsername,
+  updateComment,
 } = require("../model/model");
 module.exports = {
   getTopics,
@@ -24,6 +25,7 @@ module.exports = {
   deleteComment,
   getUsers,
   getUserByUsername,
+  patchComment,
 };
 
 function getTopics(request, response, next) {
@@ -120,6 +122,16 @@ function getUserByUsername(request, response, next) {
   selectUserByUsername(username)
     .then((user) => {
       response.status(200).send(user);
+    })
+    .catch(next);
+}
+
+function patchComment(request, response, next) {
+  const commentId = request.params.comment_id;
+  const updateRequest = request.body;
+  return updateComment(commentId, updateRequest)
+    .then((result) => {
+      response.status(200).send(result);
     })
     .catch(next);
 }
