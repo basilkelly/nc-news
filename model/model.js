@@ -98,7 +98,7 @@ function selectAllArticles(topic, queryType, sortquery, orderQuery) {
   articles.votes, 
   articles.article_img_url
   FROM articles
-  JOIN comments ON articles.article_id = comments.article_id `;
+  LEFT JOIN comments ON articles.article_id = comments.article_id `;
 
   let queryValues = [];
   if (topic && queryType === "topic") {
@@ -241,6 +241,52 @@ function updateComment(commentId, updateRequest) {
     });
 }
 
+function addArticle(article) {
+  const articleImgUrl = article.article_img_url;
+
+  if (articleImgUrl === undefined) {
+    article.article_img_url = "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700"
+  }
+
+  const newArticleArray = [
+    article.title,
+    article.topic,
+    article.author,
+    article.body,
+    article.created_at,
+    0,
+    article.article_img_url,
+  ];
+  const query = `INSERT INTO articles (title, topic, author, body,
+    created_at, votes, article_img_url
+) 
+  VALUES ($1, $2, $3, $4, $5, $6, $7)
+  RETURNING *;
+  `;
+  return db
+    .query(query, newArticleArray)
+    .then((result) => {
+      const currentArticle = result.rows[0].article_id;
+      const newquery = `
+    SELECT CAST(COUNT(comments.article_id)AS INT) AS comment_count,
+    articles.article_id, 
+    articles.title, 
+    articles.topic, 
+    articles.author,
+    articles.body,
+    articles.created_at, 
+    articles.votes, 
+    articles.article_img_url
+    FROM articles
+    LEFT JOIN comments ON articles.article_id = comments.article_id
+    WHERE articles.article_id = $1
+    GROUP BY articles.article_id `;
+      return db.query(newquery, [currentArticle]).then((result) => {
+        return result.rows[0];
+      });
+    })
+}
+
 module.exports = {
   selectAllTopics,
   getAllEndpoints,
@@ -256,4 +302,5 @@ module.exports = {
   checkSortBy,
   selectUserByUsername,
   updateComment,
+  addArticle,
 };

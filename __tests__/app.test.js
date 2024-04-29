@@ -902,99 +902,278 @@ describe("GET /api/users/:username", () => {
       });
   });
 });
-describe('PATCH /api/comments/:comment_id', () => {
-    test('response code is 200', () => {
-      const patch = { inc_votes: 1 };
+describe("PATCH /api/comments/:comment_id", () => {
+  test("response code is 200", () => {
+    const patch = { inc_votes: 1 };
 
     return request(app).patch("/api/comments/1").send(patch).expect(200);
-    });
-    test("Succesfully patched comments database", () => {
-      const patch = { inc_votes: 1 };
-  
-      return request(app)
-        .patch("/api/comments/5")
-        .send(patch)
-        .expect(200)
-  
-        .then((response) => {
-          expect(response.body.votes).toBe(1);
-        });
-    });
-    test("returns an appropriate status and error message when given an invalid vote value", () => {
-      const patch = { inc_votes: "hello" };
-  
-      return request(app)
-        .patch("/api/comments/3")
-        .send(patch)
-        .expect(400)
-  
-        .then((response) => {
-          expect(response.body.msg).toBe("Bad request");
-        });
-    });
-    test("returns error when passed comment id that doesnt exist", () => {
-      const patch = { inc_votes: 1 };
-  
-      return request(app)
-        .patch("/api/comments/99999")
-        .send(patch)
-        .expect(404)
-        .then((response) => {
-          expect(response.body.msg).toBe("not found");
-        });
-    });
-    test("returns error when passed an invalid comment id", () => {
-      const patch = { inc_votes: 1 };
-  
-      return request(app)
-        .patch("/api/comments/acomment")
-        .send(patch)
-        .expect(400)
-  
-        .then((response) => {
-          expect(response.body.msg).toBe("Bad request");
-        });
-    });
-    test("Succesfully patched comments database when using negative numbers", () => {
-      const patch = { inc_votes: -1 };
-  
-      return request(app)
-        .patch("/api/comments/6")
-        .send(patch)
-        .expect(200)
-  
-        .then((response) => {
-          expect(response.body.votes).toBe(-1);
-        });
-    });
-    test("Succesfully increments votes based on current vote value in comment", () => {
-      const patch = { inc_votes: 1 };
-  
-      return request(app)
-        .patch("/api/comments/5")
-        .send(patch)
-        .expect(200)
-  
-        .then((response) => {
-          expect(response.body.votes).toBe(2);
-        });
-    });
-    test("returns a comments object with expected keys and value type", () => {
-      const patch = { inc_votes: 0 };
-  
-      return request(app)
-        .patch("/api/comments/1")
-        .send(patch)
-        .expect(200)
-        .then((response) => {
-          expect(response.body).toMatchObject({
-            article_id: expect.any(Number),
-            comment_id: expect.any(Number),
-            author: expect.any(String),
-            body: expect.any(String),
-            created_at: expect.any(String),
-            votes: expect.any(Number),
-          });
-        });
-    });
   });
+  test("Succesfully patched comments database", () => {
+    const patch = { inc_votes: 1 };
+
+    return request(app)
+      .patch("/api/comments/5")
+      .send(patch)
+      .expect(200)
+
+      .then((response) => {
+        expect(response.body.votes).toBe(1);
+      });
+  });
+  test("returns an appropriate status and error message when given an invalid vote value", () => {
+    const patch = { inc_votes: "hello" };
+
+    return request(app)
+      .patch("/api/comments/3")
+      .send(patch)
+      .expect(400)
+
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
+      });
+  });
+  test("returns error when passed comment id that doesnt exist", () => {
+    const patch = { inc_votes: 1 };
+
+    return request(app)
+      .patch("/api/comments/99999")
+      .send(patch)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("not found");
+      });
+  });
+  test("returns error when passed an invalid comment id", () => {
+    const patch = { inc_votes: 1 };
+
+    return request(app)
+      .patch("/api/comments/acomment")
+      .send(patch)
+      .expect(400)
+
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
+      });
+  });
+  test("Succesfully patched comments database when using negative numbers", () => {
+    const patch = { inc_votes: -1 };
+
+    return request(app)
+      .patch("/api/comments/6")
+      .send(patch)
+      .expect(200)
+
+      .then((response) => {
+        expect(response.body.votes).toBe(-1);
+      });
+  });
+  test("Succesfully increments votes based on current vote value in comment", () => {
+    const patch = { inc_votes: 1 };
+
+    return request(app)
+      .patch("/api/comments/5")
+      .send(patch)
+      .expect(200)
+
+      .then((response) => {
+        expect(response.body.votes).toBe(2);
+      });
+  });
+  test("returns a comments object with expected keys and value type", () => {
+    const patch = { inc_votes: 0 };
+
+    return request(app)
+      .patch("/api/comments/1")
+      .send(patch)
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toMatchObject({
+          article_id: expect.any(Number),
+          comment_id: expect.any(Number),
+          author: expect.any(String),
+          body: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+        });
+      });
+  });
+});
+describe("POST /api/articles", () => {
+  test("response code is 201", () => {
+    const post = {
+      title: "Living in the shadow of a great man",
+      topic: "mitch",
+      author: "butter_bridge",
+      body: "I find this existence challenging",
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+    return request(app).post("/api/articles").send(post).expect(201);
+  });
+
+  test("returns an object", () => {
+    const post = {
+      title: "Living in the shadow of a great man",
+      topic: "mitch",
+      author: "butter_bridge",
+      body: "I find this existence challenging",
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(post)
+      .expect(201)
+      .then((response) => {
+        expect(typeof response.body).toBe("object");
+        expect(Array.isArray(response.body)).toBe(false);
+        expect(response.body).not.toBeNull();
+      });
+  });
+
+  test("returns an object with expected keys and values", () => {
+    const post = {
+      title: "Living in the shadow of a great man",
+      topic: "mitch",
+      author: "butter_bridge",
+      body: "I find this existence challenging",
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(post)
+      .expect(201)
+      .then((response) => {
+        expect(response.body).toMatchObject({
+          title: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          topic: expect.any(String),
+          article_img_url: expect.any(String),
+          article_id: expect.any(Number),
+          votes: 0,
+          created_at: null,
+          comment_count: expect.any(Number),
+        });
+      });
+  });
+  test("returns expected object for a given post", () => {
+    const post = {
+      title: "Living in the shadow of a great man",
+      topic: "mitch",
+      author: "butter_bridge",
+      body: "I find this existence challenging",
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(post)
+      .expect(201)
+      .then((response) => {
+        console.log(response.body);
+        expect(response.body).toMatchObject({
+          title: "Living in the shadow of a great man",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          topic: "mitch",
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          article_id: expect.any(Number),
+          votes: expect.any(Number),
+          created_at: null,
+          comment_count: expect.any(Number),
+        });
+      });
+  });
+  test("should use a placeholder article image if article image is not provided in the request", () => {
+    const post = {
+      title: "Living in the shadow of a great man",
+      topic: "mitch",
+      author: "butter_bridge",
+      body: "I find this existence challenging",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(post)
+      .expect(201)
+      .then((response) => {
+        expect(response.body).toMatchObject({
+          article_img_url:
+            "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700",
+        });
+      });
+  });
+
+  test("returns an appropriate status and error message when given an non existent topic value", () => {
+    const post = {
+      title: "Living in the shadow of a great man",
+      topic: "anewtopic",
+      author: "butter_bridge",
+      body: "I find this existence challenging",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(post)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toEqual("Bad request");
+      });
+  });
+
+  test("returns an appropriate status and error message when given an non existent author value", () => {
+    const post = {
+      title: "Living in the shadow of a great man",
+      topic: "mitch",
+      author: "newauthor",
+      body: "I find this existence challenging",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(post)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toEqual("Bad request");
+      });
+  });
+
+  test("returns an appropriate status and error message when given an non existent topic value", () => {
+    const post = {
+      title: "Living in the shadow of a great man",
+      topic: "newtopic",
+      author: "butter_bridge",
+      body: "I find this existence challenging",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(post)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toEqual("Bad request");
+      });
+  });
+
+  test("returns an error if given a post with a missing property", () => {
+    const post = {
+      title: "Living in the shadow of a great man",
+      topic: "mitch",
+      author: "butter_bridge",
+    };
+
+    return request(app)
+      .post("/api/articles")
+      .send(post)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toEqual("Bad request");
+      });
+  });
+});
