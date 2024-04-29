@@ -13,6 +13,7 @@ const {
   checkSortBy,
   selectUserByUsername,
   updateComment,
+  addArticle,
 } = require("../model/model");
 module.exports = {
   getTopics,
@@ -26,6 +27,7 @@ module.exports = {
   getUsers,
   getUserByUsername,
   patchComment,
+  postArticle
 };
 
 function getTopics(request, response, next) {
@@ -81,7 +83,6 @@ function getArticleComments(request, response, next) {
 function postComment(request, response, next) {
   const articleId = request.params.article_id;
   const comment = request.body;
-
   return addArticleComment(articleId, comment)
     .then((result) => {
       response.status(201).send(result);
@@ -134,4 +135,13 @@ function patchComment(request, response, next) {
       response.status(200).send(result);
     })
     .catch(next);
+}
+
+function postArticle(request, response, next) {
+  const article = request.body;
+  return addArticle(article)
+    .then((result) => {
+    response.status(201).send(result);
+  })
+  .catch(next);
 }
