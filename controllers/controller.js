@@ -27,7 +27,7 @@ module.exports = {
   getUsers,
   getUserByUsername,
   patchComment,
-  postArticle
+  postArticle,
 };
 
 function getTopics(request, response, next) {
@@ -59,15 +59,20 @@ function getArticles(request, response, next) {
   const { topic } = request.query;
   const { sort_by } = request.query;
   const { order } = request.query;
-
+  const { limit } = request.query;
+  const { p } = request.query;
   Promise.all([
     checkSortBy(sort_by),
     checkTopic(topic),
-    selectAllArticles(topic, query[0], sort_by, order),
+    selectAllArticles(topic, query[0], sort_by, order, limit, p),
   ])
     .then((result) => {
       result.reverse();
-      response.status(200).send(result[0]);
+      if (limit || p) {
+        response.status(200).send(result[0]);
+      } else {
+        response.status(200).send(result[0][0].articles);
+      }
     })
     .catch(next);
 }
@@ -141,7 +146,7 @@ function postArticle(request, response, next) {
   const article = request.body;
   return addArticle(article)
     .then((result) => {
-    response.status(201).send(result);
-  })
-  .catch(next);
+      response.status(201).send(result);
+    })
+    .catch(next);
 }

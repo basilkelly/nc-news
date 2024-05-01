@@ -209,7 +209,7 @@
       "created_at": "2020-09-19T23:10:00.000Z"
     }
   },
-  "POST /api/articles" : {
+  "POST /api/articles": {
     "description": "serves an object of a new article based on request body",
     "queries": [],
     "exampleResponse": {
@@ -217,12 +217,66 @@
       "author": "butter_bridge",
       "body": "I find this existence challenging",
       "topic": "mitch",
-      "article_img_url":
-        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+      "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
       "article_id": 20,
       "votes": 0,
       "created_at": null,
       "comment_count": 0
     }
+  },
+  "GET /api/articles?limit": {
+    "description": "serves an array of articles limited by a given number",
+    "queries": [],
+    "exampleResponse": [
+      {
+        "articles": [
+          {
+            "title": "A",
+            "topic": "mitch",
+            "author": "icellusedkars",
+            "body": "Delicious tin of cat food",
+            "created_at": 1602986400000,
+            "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+          },
+          {
+            "title": "UNCOVERED: catspiracy to bring down democracy",
+            "topic": "cats",
+            "author": "rogersop",
+            "body": "Bastet walks amongst us, and the cats are taking arms!",
+            "created_at": 1596464040000,
+            "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+          }
+        ]
+      },
+      { "total_count": 18 }
+    ]
+  },
+
+  "GET /api/articles?p": {
+    "description": "serves an array of articles and a total articles count property. Articles are offset by the limit, defaulted to 10, to display a specified page of articles",
+    "queries": [],
+    "exampleResponse": [
+      {
+        "articles": [
+          {
+            "title": "They're not exactly dogs, are they?",
+            "topic": "mitch",
+            "author": "butter_bridge",
+            "body": "Well? Think about it.",
+            "created_at": 1591438200000,
+            "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+          },
+          {
+            "title": "Seven inspirational thought leaders from Manchester UK",
+            "topic": "mitch",
+            "author": "rogersop",
+            "body": "Who are we kidding, there is only one, and it's Mitch!",
+            "created_at": 1589433300000,
+            "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+          }
+        ]
+      },
+      { "total_count": 18 }
+    ]
   }
 }

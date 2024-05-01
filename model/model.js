@@ -69,7 +69,14 @@ function checkSortBy(sortByQuery) {
   }
   return true;
 }
-function selectAllArticles(topic, queryType, sortquery, orderQuery) {
+function selectAllArticles(
+  topic,
+  queryType,
+  sortquery,
+  orderQuery,
+  limitQuery,
+  pageQuery
+) {
   let order = "DESC";
   if (
     orderQuery !== undefined &&
@@ -101,7 +108,7 @@ function selectAllArticles(topic, queryType, sortquery, orderQuery) {
   LEFT JOIN comments ON articles.article_id = comments.article_id `;
 
   let queryValues = [];
-  if (topic && queryType === "topic") {
+  if (topic) {
     queryString += ` WHERE articles.topic = $1`;
     queryValues.push(topic);
   }
@@ -109,7 +116,7 @@ function selectAllArticles(topic, queryType, sortquery, orderQuery) {
 GROUP BY articles.article_id`;
 
   let sort = "created_at";
-  if (queryType === "sort_by" && allowedSortQueries.includes(sortquery)) {
+  if (sortquery && allowedSortQueries.includes(sortquery)) {
     if (sortquery != "comment_count") {
       sort = sortquery;
       queryString += ` ORDER BY articles.${sort} ${order}`;
@@ -122,7 +129,46 @@ GROUP BY articles.article_id`;
     queryString += ` ORDER BY created_at ${order}`;
   }
   return db.query(queryString, queryValues).then((result) => {
-    return result.rows;
+    const articleCount = {};
+    articleCount.total_count = result.rowCount;
+    let limitNum = Number(limitQuery);
+
+    if (limitQuery === "ALL") {
+      queryString += ` LIMIT ALL`;
+      limitNum = result.rowCount
+      
+    }
+
+    if (limitQuery && limitQuery != "ALL") {
+      if (limitQuery === "ALL") {
+        queryString += ` LIMIT ALL`;
+      }
+      if (isNaN(limitNum)) {
+        return Promise.reject({ status: 400, msg: "Bad request" });
+      }
+        queryString += ` LIMIT ${limitNum}`; 
+    }
+    else if (pageQuery && limitQuery !== "ALL") {
+      queryString += ` LIMIT 10`;
+    }
+
+    if (pageQuery) {
+      if (isNaN(limitNum)) {
+        limitNum = 10;
+      }
+      let pageNum = Number(pageQuery);
+      if (isNaN(pageNum)) {
+        return Promise.reject({ status: 400, msg: "Bad request" });
+      }
+      let offsetNum = (pageNum - 1) * limitNum;
+      queryString += ` OFFSET ${offsetNum}`;
+    }
+    return db.query(queryString, queryValues).then((result) => {
+      const articles = {};
+      articles.articles = result.rows;
+
+      return [articles, articleCount];
+    });
   });
 }
 
@@ -245,7 +291,8 @@ function addArticle(article) {
   const articleImgUrl = article.article_img_url;
 
   if (articleImgUrl === undefined) {
-    article.article_img_url = "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700"
+    article.article_img_url =
+      "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700";
   }
 
   const newArticleArray = [
@@ -263,11 +310,9 @@ function addArticle(article) {
   VALUES ($1, $2, $3, $4, $5, $6, $7)
   RETURNING *;
   `;
-  return db
-    .query(query, newArticleArray)
-    .then((result) => {
-      const currentArticle = result.rows[0].article_id;
-      const newquery = `
+  return db.query(query, newArticleArray).then((result) => {
+    const currentArticle = result.rows[0].article_id;
+    const newquery = `
     SELECT CAST(COUNT(comments.article_id)AS INT) AS comment_count,
     articles.article_id, 
     articles.title, 
@@ -281,10 +326,10 @@ function addArticle(article) {
     LEFT JOIN comments ON articles.article_id = comments.article_id
     WHERE articles.article_id = $1
     GROUP BY articles.article_id `;
-      return db.query(newquery, [currentArticle]).then((result) => {
-        return result.rows[0];
-      });
-    })
+    return db.query(newquery, [currentArticle]).then((result) => {
+      return result.rows[0];
+    });
+  });
 }
 
 module.exports = {
