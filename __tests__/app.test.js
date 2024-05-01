@@ -1190,13 +1190,13 @@ describe("GET /api/articles (pagination limit query) ", () => {
         expect(Array.isArray(result)).toBe(true);
       });
   });
-  test("returns array containing botha total count and an articles object", () => {
+  test("returns array containing both a total count and an articles object", () => {
     return request(app)
       .get("/api/articles?limit=5")
       .expect(200)
       .then((response) => {
         const result = response.body;
-        expect(result.length).toBe(2)
+        expect(result.length).toBe(2);
         expect(result[0].hasOwnProperty("articles")).toBe(true);
         expect(result[1].hasOwnProperty("total_count")).toBe(true);
       });
@@ -1348,6 +1348,132 @@ describe("GET /api/articles (pagination page query) ", () => {
       .then((response) => {
         const result = response.body[1].total_count;
         expect(result).toBe(1);
+      });
+  });
+});
+
+describe("GET /api/articles/:article_id/comments (pagination limit query) ", () => {
+  test("response code is 200", () => {
+    return request(app).get("/api/articles/1/comments?limit=5").expect(200);
+  });
+
+  test("returns a comments array", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5")
+      .expect(200)
+      .then((response) => {
+        const result = response.body;
+        expect(Array.isArray(result)).toBe(true);
+      });
+  });
+
+  test("returns comments array of correct length given by limit query", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5")
+      .expect(200)
+      .then((response) => {
+        const result = response.body;
+        expect(result.length).toBe(5);
+      });
+  });
+  test("returns an appropriate status and error message when given an invalid limit query", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=fiveComments")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
+      });
+  });
+  test("should retrieve all comments when using limit all", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=ALL")
+      .expect(200)
+      .then((response) => {
+        const result = response.body;
+        expect(result.length).toBe(11);
+      });
+  });
+  test("returns default limit of 10 when not given a limit query", () => {
+    return request(app)
+      .get("/api/articles/1/comments?p=1")
+      .expect(200)
+      .then((response) => {
+        const result = response.body;
+        expect(result.length).toBe(10);
+      });
+  });
+});
+
+describe("GET /api/articles/:article_id/comments (pagination page query)", () => {
+  test("response code is 200", () => {
+    return request(app).get("/api/articles/1/comments?p=1").expect(200);
+  });
+  test("returns an array", () => {
+    return request(app)
+      .get("/api/articles/1/comments?p=1")
+      .expect(200)
+      .then((response) => {
+        const result = response.body;
+        expect(Array.isArray(result)).toBe(true);
+      });
+  });
+  test("returns correct number of comments for a first page", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5&p=1")
+      .expect(200)
+      .then((response) => {
+        const result = response.body;
+        expect(result.length).toBe(5);
+      });
+  });
+  test("returns correct number of comments for a last page", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5&p=3")
+      .expect(200)
+      .then((response) => {
+        const result = response.body;
+        expect(result.length).toBe(1);
+      });
+  });
+
+  test("returns correct comment when using limit query", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5&p=1")
+      .expect(200)
+      .then((response) => {
+        const result = response.body;
+        expect(result[0]).toMatchObject({
+          comment_id: 5,
+          body: "I hate streaming noses",
+          article_id: 1,
+          author: "icellusedkars",
+          votes: 2,
+          created_at: "2020-11-03T21:00:00.000Z",
+        });
+      });
+  });
+  test("returns correct comment when using default limit", () => {
+    return request(app)
+      .get("/api/articles/1/comments?p=2")
+      .expect(200)
+      .then((response) => {
+        const result = response.body;
+        expect(result[0]).toMatchObject({
+          article_id: 1,
+          author: "icellusedkars",
+          body: "Superficially charming",
+          comment_id: 9,
+          created_at: "2020-01-01T03:08:00.000Z",
+          votes: 0,
+        });
+      });
+  });
+  test("returns an appropriate status and error message for an invalid page request", () => {
+    return request(app)
+      .get("/api/articles/1/comments?p=pagetwo")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
       });
   });
 });
