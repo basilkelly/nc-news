@@ -1075,7 +1075,6 @@ describe("POST /api/articles", () => {
       .send(post)
       .expect(201)
       .then((response) => {
-        console.log(response.body);
         expect(response.body).toMatchObject({
           title: "Living in the shadow of a great man",
           author: "butter_bridge",
@@ -1174,6 +1173,181 @@ describe("POST /api/articles", () => {
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toEqual("Bad request");
+      });
+  });
+});
+
+describe("GET /api/articles (pagination limit query) ", () => {
+  test("response code is 200", () => {
+    return request(app).get("/api/articles?limit=5").expect(200);
+  });
+  test("returns an array", () => {
+    return request(app)
+      .get("/api/articles?limit=5")
+      .expect(200)
+      .then((response) => {
+        const result = response.body;
+        expect(Array.isArray(result)).toBe(true);
+      });
+  });
+  test("returns array containing botha total count and an articles object", () => {
+    return request(app)
+      .get("/api/articles?limit=5")
+      .expect(200)
+      .then((response) => {
+        const result = response.body;
+        expect(result.length).toBe(2)
+        expect(result[0].hasOwnProperty("articles")).toBe(true);
+        expect(result[1].hasOwnProperty("total_count")).toBe(true);
+      });
+  });
+  test("returns articles array of correct length given by limit query", () => {
+    return request(app)
+      .get("/api/articles?limit=5")
+      .expect(200)
+      .then((response) => {
+        const result = response.body[0].articles;
+        expect(result.length).toBe(5);
+      });
+  });
+  test("returns an appropriate status and error message when given an invalid limit query", () => {
+    return request(app)
+      .get("/api/articles?limit=ARTICLE")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
+      });
+  });
+  test("should retrieve all articles when using limit all", () => {
+    return request(app)
+      .get("/api/articles?limit=ALL")
+      .expect(200)
+      .then((response) => {
+        const result = response.body[0].articles;
+        expect(result.length).toBe(18);
+      });
+  });
+  test("returns default limit of 10 when articles not given a limit query", () => {
+    return request(app)
+      .get("/api/articles?p=1")
+      .expect(200)
+      .then((response) => {
+        const result = response.body[0].articles;
+        expect(result.length).toBe(10);
+      });
+  });
+  test("should return correct article count in response, unaffected by limit", () => {
+    return request(app)
+      .get("/api/articles?p=1")
+      .expect(200)
+      .then((response) => {
+        const result = response.body[1].total_count;
+        expect(result).toBe(18);
+      });
+  });
+  test("should return correct article count with filter applied, when limiting articles ", () => {
+    return request(app)
+      .get("/api/articles?limit=3&topic=mitch")
+      .expect(200)
+      .then((response) => {
+        const result = response.body[1].total_count;
+        expect(result).toBe(17);
+      });
+  });
+});
+describe("GET /api/articles (pagination page query) ", () => {
+  test("response code is 200", () => {
+    return request(app).get("/api/articles?p=1").expect(200);
+  });
+  test("returns an array", () => {
+    return request(app)
+      .get("/api/articles?limit=20&p=1")
+      .expect(200)
+      .then((response) => {
+        const result = response.body[0].articles;
+        expect(Array.isArray(result)).toBe(true);
+      });
+  });
+  test("returns correct number of articles for first page", () => {
+    return request(app)
+      .get("/api/articles?limit=5&p=1")
+      .expect(200)
+      .then((response) => {
+        const result = response.body[0].articles;
+        expect(result.length).toBe(5);
+      });
+  });
+  test("returns correct number of articles for last page", () => {
+    return request(app)
+      .get("/api/articles?limit=5&p=4")
+      .expect(200)
+      .then((response) => {
+        const result = response.body[0].articles;
+        expect(result.length).toBe(3);
+      });
+  });
+  test("returns correct first article", () => {
+    return request(app)
+      .get("/api/articles")
+      .then((response) => {
+        const articles = response.body;
+        return request(app)
+          .get("/api/articles?limit=1&p=1")
+          .expect(200)
+          .then((response) => {
+            const result = response.body[0].articles;
+            expect(result[0]).toEqual(articles[0]);
+          });
+      });
+  });
+  test("returns correct first article for second page", () => {
+    return request(app)
+      .get("/api/articles")
+      .then((response) => {
+        const articles = response.body;
+        return request(app)
+          .get("/api/articles?limit=5&p=2")
+          .expect(200)
+          .then((response) => {
+            const result = response.body[0].articles;
+            expect(result[0]).toEqual(articles[5]);
+          });
+      });
+  });
+  test("returns correct article when using default limit", () => {
+    return request(app)
+      .get("/api/articles?p=2")
+      .expect(200)
+      .then((response) => {
+        const result = response.body[0].articles;
+        expect(result[0]).toMatchObject({
+          comment_count: "2",
+          article_id: 5,
+          title: "UNCOVERED: catspiracy to bring down democracy",
+          topic: "cats",
+          author: "rogersop",
+          created_at: "2020-08-03T13:14:00.000Z",
+          votes: -1,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  test("returns an appropriate status and error message for an invalid page request", () => {
+    return request(app)
+      .get("/api/articles?p=pagefive")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
+      });
+  });
+  test("should return correct article count with filter applied, when offset to another page", () => {
+    return request(app)
+      .get("/api/articles?p=2&topic=cats")
+      .expect(200)
+      .then((response) => {
+        const result = response.body[1].total_count;
+        expect(result).toBe(1);
       });
   });
 });
