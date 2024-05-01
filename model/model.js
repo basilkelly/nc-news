@@ -135,8 +135,7 @@ GROUP BY articles.article_id`;
 
     if (limitQuery === "ALL") {
       queryString += ` LIMIT ALL`;
-      limitNum = result.rowCount
-      
+      limitNum = result.rowCount;
     }
 
     if (limitQuery && limitQuery != "ALL") {
@@ -146,9 +145,8 @@ GROUP BY articles.article_id`;
       if (isNaN(limitNum)) {
         return Promise.reject({ status: 400, msg: "Bad request" });
       }
-        queryString += ` LIMIT ${limitNum}`; 
-    }
-    else if (pageQuery && limitQuery !== "ALL") {
+      queryString += ` LIMIT ${limitNum}`;
+    } else if (pageQuery && limitQuery !== "ALL") {
       queryString += ` LIMIT 10`;
     }
 
@@ -172,14 +170,39 @@ GROUP BY articles.article_id`;
   });
 }
 
-function SelectArticleComments(articleId) {
-  return db
-    .query(
-      `SELECT *
+function SelectArticleComments(articleId, limitQuery, pageQuery) {
+  let queryString = `SELECT *
 FROM comments
-WHERE comments.article_id = $1 ORDER BY created_at DESC`,
-      [articleId]
-    )
+WHERE comments.article_id = $1 ORDER BY created_at DESC`;
+  let limitNum = Number(limitQuery);
+
+  if (limitQuery === "ALL") {
+    queryString += ` LIMIT ALL`;
+  }
+
+  if (limitQuery && limitQuery != "ALL") {
+    if (isNaN(limitQuery)) {
+      return Promise.reject({ status: 400, msg: "Bad request" });
+    }
+    queryString += ` LIMIT ${limitNum}`;
+  } else if (pageQuery && limitQuery !== "ALL") {
+    queryString += ` LIMIT 10`;
+  }
+
+  if (pageQuery) {
+    if (isNaN(limitNum)) {
+      limitNum = 10;
+    }
+    let pageNum = Number(pageQuery);
+    if (isNaN(pageNum)) {
+      return Promise.reject({ status: 400, msg: "Bad request" });
+    }
+    let offsetNum = (pageNum - 1) * limitNum;
+    queryString += ` OFFSET ${offsetNum}`;
+  }
+
+  return db
+    .query(queryString, [articleId])
 
     .then((result) => {
       if (result.rows.length === 0) {

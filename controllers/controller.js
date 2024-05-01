@@ -78,7 +78,9 @@ function getArticles(request, response, next) {
 }
 function getArticleComments(request, response, next) {
   const articleId = request.params.article_id;
-  SelectArticleComments(articleId)
+  const { limit } = request.query;
+  const { p } = request.query;
+  SelectArticleComments(articleId, limit, p)
     .then((commentsArray) => {
       response.status(200).send(commentsArray);
     })
