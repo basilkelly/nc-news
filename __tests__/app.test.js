@@ -1520,7 +1520,7 @@ describe("POST /api/topics", () => {
         });
       });
   });
-  test("returns an object with expected keys and values", () => {
+  test("returns expected object for a given topic", () => {
     const topic = {
       slug: "a new topic 4",
       description: "a new topics description",
