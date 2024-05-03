@@ -1477,3 +1477,89 @@ describe("GET /api/articles/:article_id/comments (pagination page query)", () =>
       });
   });
 });
+
+describe("POST /api/topics", () => {
+  test("response code is 201", () => {
+    const topic = {
+      slug: "a new topic",
+      description: "a new topics description",
+    };
+
+    return request(app).post("/api/topics").send(topic).expect(201);
+  });
+  test("returns a topic object", () => {
+    const topic = {
+      slug: "a new topic 2",
+      description: "a new topics description",
+    };
+
+    return request(app)
+      .post("/api/topics")
+      .send(topic)
+      .expect(201)
+      .then((response) => {
+        expect(typeof response.body).toBe("object");
+        expect(Array.isArray(response.body)).toBe(false);
+        expect(response.body).not.toBeNull();
+      });
+  });
+  test("returns an object with expected keys and values", () => {
+    const topic = {
+      slug: "a new topic 3",
+      description: "a new topics description",
+    };
+
+    return request(app)
+      .post("/api/topics")
+      .send(topic)
+      .expect(201)
+      .then((response) => {
+        expect(response.body).toMatchObject({
+          slug: expect.any(String),
+          description: expect.any(String),
+        });
+      });
+  });
+  test("returns expected object for a given topic", () => {
+    const topic = {
+      slug: "a new topic 4",
+      description: "a new topics description",
+    };
+
+    return request(app)
+      .post("/api/topics")
+      .send(topic)
+      .expect(201)
+      .then((response) => {
+        expect(response.body).toMatchObject({
+          slug: "a new topic 4",
+          description: "a new topics description",
+        });
+      });
+  });
+  test("returns an appropriate status code and error message when topic slug already exists for another topic", () => {
+    const topic = {
+      slug: "a new topic 4",
+      description: "a new topics description",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(topic)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toEqual("Bad request");
+      });
+  });
+  test("returns an error if given a topic request body with a missing slug", () => {
+    const topic = {
+      description: "a new topics description",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(topic)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toEqual("Bad request");
+      });
+  });
+});
