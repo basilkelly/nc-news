@@ -25,6 +25,9 @@ app.use((error, request, response, next) => {
   }
   if (error.code === "23503") {
     return response.status(400).send({ msg: "Bad request" });
+  }
+  if (error.code === "23505") {
+    return response.status(400).send({ msg: "Bad request" });
   } else next(error);
 });
 

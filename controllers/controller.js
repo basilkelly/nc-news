@@ -14,6 +14,7 @@ const {
   selectUserByUsername,
   updateComment,
   addArticle,
+  addTopic,
 } = require("../model/model");
 module.exports = {
   getTopics,
@@ -28,6 +29,7 @@ module.exports = {
   getUserByUsername,
   patchComment,
   postArticle,
+  postTopic,
 };
 
 function getTopics(request, response, next) {
@@ -147,6 +149,15 @@ function patchComment(request, response, next) {
 function postArticle(request, response, next) {
   const article = request.body;
   return addArticle(article)
+    .then((result) => {
+      response.status(201).send(result);
+    })
+    .catch(next);
+}
+
+function postTopic(request, response, next) {
+  const topic = request.body;
+  return addTopic(topic)
     .then((result) => {
       response.status(201).send(result);
     })

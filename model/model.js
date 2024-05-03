@@ -355,6 +355,17 @@ function addArticle(article) {
   });
 }
 
+function addTopic(topic) {
+  const newTopicArray = [topic.slug, topic.description];
+  const query = `INSERT INTO topics (slug, description) 
+  VALUES ($1, $2)
+  RETURNING *;
+  `;
+  return db.query(query, newTopicArray).then((result) => {
+    return result.rows[0];
+  });
+}
+
 module.exports = {
   selectAllTopics,
   getAllEndpoints,
@@ -371,4 +382,5 @@ module.exports = {
   selectUserByUsername,
   updateComment,
   addArticle,
+  addTopic,
 };
