@@ -15,6 +15,9 @@ const {
   updateComment,
   addArticle,
   addTopic,
+  checkArticle,
+  removeArticle,
+  removeArticleComments,
 } = require("../model/model");
 module.exports = {
   getTopics,
@@ -30,6 +33,7 @@ module.exports = {
   patchComment,
   postArticle,
   postTopic,
+  deleteArticle,
 };
 
 function getTopics(request, response, next) {
@@ -160,6 +164,19 @@ function postTopic(request, response, next) {
   return addTopic(topic)
     .then((result) => {
       response.status(201).send(result);
+    })
+    .catch(next);
+}
+
+function deleteArticle(request, response, next) {
+  const articleId = request.params.article_id;
+  Promise.all([
+    checkArticle(articleId),
+    removeArticle(articleId),
+    removeArticleComments(articleId),
+  ])
+    .then(() => {
+      response.status(204).send({ msg: "No content" });
     })
     .catch(next);
 }

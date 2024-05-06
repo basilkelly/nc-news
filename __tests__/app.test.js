@@ -1563,3 +1563,86 @@ describe("POST /api/topics", () => {
       });
   });
 });
+
+describe("DELETE /api/articles/:article_id", () => {
+  test("response code is 204", () => {
+    const post = {
+      title: "Living in the shadow of a great man",
+      topic: "mitch",
+      author: "butter_bridge",
+      body: "I find this existence challenging",
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(post)
+      .expect(201)
+      .then((response) => {
+        const articleToDelete = response.body.article_id;
+
+        return request(app)
+          .delete(`/api/articles/${articleToDelete}`)
+          .expect(204);
+      });
+  });
+  test("Deletes a row", () => {
+    const post = {
+      title: "Living in the shadow of a great man",
+      topic: "mitch",
+      author: "butter_bridge",
+      body: "I find this existence challenging",
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(post)
+      .expect(201)
+      .then((response) => {
+        const articleToDelete = response.body.article_id;
+
+        return request(app)
+          .delete(`/api/articles/${articleToDelete}`)
+          .expect(204)
+          .then(() => {
+            return db.query(
+              `SELECT * FROM articles WHERE articles.article_id = $1`,
+              [articleToDelete]
+            );
+          })
+          .then(({ rows }) => {
+            expect(rows).toEqual([]);
+          });
+      });
+  });
+  test("returns an appropriate status and error message when given an article that does not exist", () => {
+    return request(app)
+      .delete("/api/articles/100")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("not found");
+      });
+  });
+  test("deletes all comments for a specified article", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(() => {
+        return request(app)
+          .delete("/api/articles/1")
+          .expect(204)
+          .then(() => {
+            return request(app).get("/api/articles/1/comments").expect(404);
+          });
+      });
+  });
+  test("returns an appropriate status and error message when given an invalid article id", () => {
+    return request(app)
+      .delete("/api/articles/article")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad request");
+      });
+  });
+});
