@@ -366,6 +366,26 @@ function addTopic(topic) {
   });
 }
 
+function checkArticle(articleId) {
+  const query = `SELECT * FROM articles WHERE article_id = $1`;
+  return db.query(query, [articleId]).then((result) => {
+    if (result.rowCount === 0) {
+      return Promise.reject({ status: 404, msg: "not found" });
+    }
+    return result.rows;
+  });
+}
+
+function removeArticle(articleId) {
+  const query = `DELETE FROM articles WHERE article_id = $1`;
+  return db.query(query, [articleId]);
+}
+
+function removeArticleComments(articleId) {
+  const query = `DELETE FROM comments WHERE article_id = $1`;
+  return db.query(query, [articleId]);
+}
+
 module.exports = {
   selectAllTopics,
   getAllEndpoints,
@@ -383,4 +403,7 @@ module.exports = {
   updateComment,
   addArticle,
   addTopic,
+  checkArticle,
+  removeArticle,
+  removeArticleComments,
 };

@@ -286,5 +286,10 @@
       "slug": "dogs",
       "description": "not cats"
     }
+  },
+  "DELETE /api/articles/:article_id": {
+    "description": "deletes a specified article and all comments for that article, returns 204 status code and no content",
+    "queries": [],
+    "exampleResponse": { "msg": "no content" }
   }
 }
