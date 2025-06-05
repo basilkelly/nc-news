@@ -10,13 +10,13 @@ nc-news is an api for accessing and modifying an applications data. nc-news stor
 # How to Clone and setup your own nc-news
 Please ensure you version of node is at least version v21.4.0 and you have at least version 8.11.3 of postgres. Lower versions are not supported and may cause the app to not function as intended.
 
-# cloning
+# Cloning
 To Clone nc-news copy the url from the github page (found in the green code button) and then run the following command in your terminal in directory you want the project to be cloned to:
 Git clone <url>
 
-replacing the <url> with the url you copied from github. The url shhould look something like this: "https://github.com/basilkelly/nc-news.git"
+Replacing the <url> with the url you copied from github. The url shhould look something like this: "https://github.com/basilkelly/nc-news.git"
 
-# install dependencies
+# Install Dependencies
 nc-news requires some dependancies in order to function correctly. These are: dotenv, express, pg and husky
 
 To install these run the following commands in the terminal:
@@ -26,17 +26,17 @@ npm install express
 npm install pg
 npm install husky
 
-# seeding the local database
+# Seeding the Local Database
 To seed the database run the following command in the terminal:
 
 npm seed
 
-# running tests
+# Running Tests
 To run the tests run the following command in the terminal:
 
 npm test
 
-# Creating Environments variables
+# Creating Environments Variables
 Two .env files must be created. one for the test database and the other for the development database.
 
 These should be named ".env.test" for the test environment file and ".env.development" for the development environment file (without the quotation marks).
