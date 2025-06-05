@@ -46,3 +46,6 @@ The .env.development file should connect to the nc_news database.
 
 An example of how to do this is given in the ".env.example" file.
 A password may be required, in this case include your password using the command PGPASSWORD=examplepassword on a new line in the env file(replace examplepassword with your password).
+
+# Links
+- [View the Frontend repo for this project](https://github.com/basilkelly/fe-nc-news)
