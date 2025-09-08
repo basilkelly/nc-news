@@ -49,3 +49,6 @@ A password may be required, in this case include your password using the command
 
 # Links
 - [View the Frontend repo for this project](https://github.com/basilkelly/fe-nc-news)
+
+
+This portfolio project was created as part of a Digital Skills Bootcamp in Software Engineering provided by [Northcoders](https://northcoders.com/)
